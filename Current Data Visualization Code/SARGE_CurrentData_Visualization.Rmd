@@ -1,0 +1,228 @@
+---
+title: "SARGE Real Time Data Visualization Code"
+author: "Stephanie J. Wilson"
+date: Sys.Date()
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+
+# Load necessary packages 
+library(data.table); library(tidyverse)
+library(readxl); library(lubridate)
+library(ggpubr); library(cowplot)
+library(plotrix)
+
+# 
+
+```
+
+## EXO2 Sonde (Xylem Analytics) Current Data 
+```{r, echo=FALSE}
+
+#Read in current water quality sonde (EXO2) data from SARGE
+exo <- read.table("Example_Data/WILSON_ExoTable.dat", header=TRUE, skip=3, sep= ",")
+
+#Take a quick look at the data 
+head(exo)
+
+#could consider putting these into a csv that then I read in for the EXO to be cleaner... 
+colnames(exo) <- c("TIMESTAMP","RECORD","Date","Time","Chlorophyll_RFU","Chlorophyll_ugL",
+              "Conductivity","FDOM_QSU","FDOM_RFU","NLF_conductivity",
+              "ODO_sat","ODO_local", "ODO_MgL", "Pressure_psia", "Salinity_PPT", 
+              "Specific_Conductivity_uScm", "BGA_PE_RFU", "BGA_PE_ugL",
+              "TDS_mg_L","Turbidity_FNU","Wiper_Position_mv","pH","pH_mv","Temp_C", 
+              "Depth_m","Battery_v","Cable_v","Wiper_Current_ma","sn","snn")
+
+
+#Make a new timestamp column that is recognized as date + time measured in the timezone needed:
+exo$TIMESTAMP <- ymd_hms(exo$TIMESTAMP, tz = "EST")
+
+#Ensure that columns that should be numbers are numeric for plotting:
+exo$Depth_m <- as.numeric(exo$Depth_m)
+exo$Conductivity <- as.numeric(exo$Conductivity)
+
+
+## Plot Waterlevel (Depth_m)
+waterlev <- ggplot(exo, aes(x=TIMESTAMP, y=Depth_m)) + geom_point(color="blue") + ylim(-0.5,2.5) + xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
+     as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) + theme_classic()
+waterlev
+
+## Plot conductivity 
+cond <- ggplot(exo, aes(x=TIMESTAMP, y=Salinity_PPT)) + geom_point(color="purple") + 
+   xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
+     as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) + theme_classic()
+cond
+
+## Can plot as many or as few variables as needed, consider plotting what is useful for checks
+
+```
+
+## SontekIQ series (Xylem Analytics) Current Data 
+```{r, echo=FALSE}
+
+#read in hydrologic data from Sontek IQ (Xylem Analytics)
+sontek <- read.table("Example_Data/WILSON_SontekTable.dat", header=TRUE, skip=1, sep= ",")
+sontek <- sontek[-(1:3), ]
+sontek <- as.tibble(sontek)
+
+#Take a quick look at the tibble created
+head(sontek)
+
+#Make a new timestamp column that is recognized as date + time measured in the timezone needed:
+sontek$TIMESTAMP <- ymd_hms(sontek$TIMESTAMP, tz = "EST")
+
+#Ensure that columns that should be numbers are numeric for plotting:
+sontek$Flowrate <- as.numeric(sontek$Flowrate)
+sontek$Water_depth <- as.numeric(sontek$Water_depth)
+
+
+## Plot Sontek Flow Data: 
+flow <- ggplot(sontek, aes(x=TIMESTAMP, y=Flowrate)) + geom_point(color="black") +       xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
+     as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) + theme_classic()
+flow
+
+## Plot Index Velocity or Water flow Velocity 
+flow1 <- ggplot(sontek, aes(x=TIMESTAMP, y=as.numeric(Index_velocity))) + geom_point(color="black") +       
+  xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
+     as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) + theme_classic()
+flow1
+
+## Plot water depth measured by the sontekIQ 
+sdepth <- ggplot(sontek, aes(x=TIMESTAMP, y=Water_depth)) + geom_point(color="darkblue") +
+    xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
+     as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) + theme_classic()
+sdepth
+
+
+#can plot other variables as needed 
+```
+
+## LI7810 CH4/CO2/H2O Trace Gas Analyzer (LI-COR) Current Data
+```{r, echo=FALSE}
+#Note that similar code could be used with a LI7820 N2O Analyzer 
+
+#read in gas concentration data from the LI7810 (LI-COR)
+flux <- read.table("Example_Data/WILSON_FLUX_7810.dat", header=TRUE, skip=1, sep= ",")
+flux <- flux[-(1:2), ]
+
+#Take a quick look at the dataframe created
+head(flux)
+
+#Make a new timestamp column that is recognized as date + time measured in the timezone needed:
+flux$TIMESTAMP1 <- ymd_hms(flux$TIMESTAMP, tz = "EST")
+
+#Ensure that columns that should be numbers are numeric for plotting:
+flux$CH4d_ppmA <- as.numeric(flux$CH4)
+flux$CO2d_ppmA <- as.numeric(flux$CO2)
+
+
+## Plot CH4 Data (Note: these are raw concentrations, not in water concentrations)
+ghg_CH4 <- ggplot(flux, aes(x=TIMESTAMP1, y=CH4d_ppmA)) + geom_point(color="darkviolet")+
+    xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
+     as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) + ylim(0,500000)+
+  theme_classic()
+ghg_CH4
+
+## Plot CO2 Data (Note: these are raw concentrations, not in water concentrations)
+ghg_CO2 <- ggplot(flux, aes(x=TIMESTAMP1, y=CO2d_ppmA)) + geom_point(color="darkred")+
+    xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
+     as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) + theme_classic()
+ghg_CO2
+
+
+```
+
+## Radon Data  
+```{r}
+# Set year,month and date of files being processed
+julian.date='2023-01-01'
+
+#set dropbox wd
+#setwd("C:/Users/wilsonsj/Dropbox (Smithsonian)/GCREW_LOGGERNET_DATA/current_data")
+#setwd("C:/Users/wilsonsj/Dropbox (Smithsonian)/GCREW_LOGGERNET_DATA")
+#setwd("S:/Biogeochemistry/COMPASS Synoptics/2024 Lateral Transport Campaigns/SWH Survey/20240823")
+setwd("C:/Users/wilsonsj/Dropbox (Smithsonian)/GENX2_Mesocosm_Data/current_data")
+
+rad <- read.table("WILSON_Rad7Table.dat", header=TRUE, skip=1, sep= ",")
+#exo1 <- read.table("GCREW_MARSH_OUTLET_ExoTable_20230419020031.dat", header=TRUE, skip=3, sep= ",")
+#exo2 <- read.table("GCREW_MARSH_OUTLET_ExoTable_20230503020034.dat", header=TRUE, skip=3, sep= ",")
+#exo <- rbind(exo1, exo2)
+rad <- rad[-(1:2), ]
+head(rad)
+
+#now make a new column from the timestamp 
+# Make sure timestamp is recognized as date + time measured in EST
+rad$TIMESTAMP <- ymd_hms(rad$TIMESTAMP, tz = "EST")
+
+# Add fractional day of year (DOY) column
+rad <- rad %>% mutate(fDOY = as.numeric(julian(rad$TIMESTAMP, julian.date)))
+colnames(rad)[26] <- "fDOY"
+
+rad$Radon_concentration_Rad7 <- as.numeric(rad$Radon_concentration_Rad7)
+rad$RH_sample_Rad7 <- as.numeric(rad$RH_sample_Rad7)
+head(rad)
+
+
+## Plot LGR Data for quick look
+radon <- ggplot(rad, aes(x=TIMESTAMP, y=Radon_concentration_Rad7)) + 
+  geom_line(color="darkgreen", linewidth=1) +
+    xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
+     as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) + theme_classic() +  
+  ylim(0,400)
+radon
+
+RH  <- ggplot(rad, aes(x=fDOY, y=RH_sample_Rad7)) + geom_point(color="red") + theme_classic()
+RH
+```
+
+## Plot these data up 
+```{r}
+
+All_Data <- ggplot() + 
+    geom_line(data=flux, aes(x=fDOY, y=CO2d_ppm/10, color="CO2"), size=0.75) + 
+    geom_line(data=flux, aes(x=fDOY, y=CH4d_ppm*1, color="CH4"), size=0.75) + 
+    geom_line(data=rad, aes(x=fDOY, y=Radon_concentration_Rad7, color="Radon"), size=0.75) + 
+    #geom_line(data=exo, aes(x=fDOY, y=Depth_m*500), color="red") +
+    scale_color_manual(values = c( "#F29559", "#012A36", "#72BDA3"))+
+    scale_y_continuous(
+    "Radon (Bq/m3) & CH4 (ppm)", limits = c(0,5000),
+    sec.axis = sec_axis(~ . *10, name = "CO2 (ppm)")) + 
+   # xlim(152, 163) + 
+    theme_classic() + 
+    labs(color=NULL)
+All_Data
+
+All_Dat <- ggplot() + 
+   # geom_line(data=flux, aes(x=fDOY, y=CO2d_ppm/10, color="CO2")) + 
+    geom_line(data=flux, aes(x=fDOY, y=CH4d_ppm*1, color="CH4"), size=0.75) + 
+    geom_line(data=rad, aes(x=fDOY, y=Radon_concentration_Rad7, color="Radon"), size=0.75) + 
+    #geom_line(data=exo, aes(x=fDOY, y=Depth_m*500), color="red") +
+    scale_color_manual(values = c("#72BDA3", "#F29559"))+
+    scale_y_continuous(
+    "Radon (Bq/m3) & CH4 (ppm)", limits = c(0,3000)) +  #,
+   # sec.axis = sec_axis(~ . *1, name = "ppm")) + 
+    #xlim(152, 163) + 
+    theme_classic() + 
+    labs(color=NULL)
+All_Dat
+
+
+All_Data1 <- ggplot() + 
+    geom_line(data=exo, aes(x=fDOY, y=Conductivity, color="Conductivity"), size=0.75) + 
+    geom_line(data=sontek, aes(x=fDOY, y=Flowrate*5, color="Flow Rate"), size=0.75) + 
+    geom_line(data=sontek, aes(x=fDOY, y=Water_depth*5, color="Water Depth"), size=0.75) + 
+    #geom_line(data=rad, aes(x=fDOY, y=`Radon [Bq/m3]`), color="blue") + 
+    #geom_line(data=exo, aes(x=fDOY, y=Depth_m*500), color="red") + 
+    scale_color_manual(values = c("#5F464B", "#6BAA75", "#2978A0"))+
+    scale_y_continuous( 
+    "Conductivity (uS/cm)", limits = c(-5,30),
+    sec.axis = sec_axis(~ . /5, name = "Water Depth (m) & Flow Rate (m/s)")) + 
+     #xlim(152, 163) + 
+    theme_classic() + 
+    labs(color=NULL)
+
+All_Data1
+
+```
+

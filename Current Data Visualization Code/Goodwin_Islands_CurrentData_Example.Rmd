@@ -1,0 +1,294 @@
+---
+title: "Flume_Data_Updater: Current Data"
+author: "Stephanie J. Wilson"
+date: Sys.Date()
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+# Load necessary packages 
+library(data.table); library(tidyverse)
+library(readxl); library(lubridate)
+library(ggpubr); library(cowplot)
+library(plotrix)
+
+
+```
+
+## EXO Data 
+```{r}
+
+
+# Set year,month and date of files being processed
+julian.date='2023-01-01'
+
+#read in the waterlevel data 
+
+#set dropbox wd
+setwd("C:/Users/wilsonsj/Dropbox (Smithsonian)/GENX2_Mesocosm_Data/current_data")
+#setwd("C:/Users/wilsonsj/Dropbox (Smithsonian)/GCREW_LOGGERNET_DATA")
+#setwd("S:/Biogeochemistry/COMPASS Synoptics/2024 Lateral Transport Campaigns/GWI Survey/20240919")
+
+exo <- read.table("WILSON_ExoTable.dat", header=TRUE, skip=3, sep= ",")
+#exo1 <- read.table("GCREW_MARSH_OUTLET_ExoTable_20230419020031.dat", header=TRUE, skip=3, sep= ",")
+#exo2 <- read.table("GCREW_MARSH_OUTLET_ExoTable_20230503020034.dat", header=TRUE, skip=3, sep= ",")
+#exo <- rbind(exo1, exo2)
+
+head(exo)
+
+colnames(exo) <- c("TIMESTAMP","RECORD","Date","Time","Chlorophyll_RFU","Chlorophyll_ugL",
+              "Conductivity","FDOM_QSU","FDOM_RFU","NLF_conductivity",
+              "ODO_sat","ODO_local", "ODO_MgL","Pressure_psia","Salinity_PPT","Specific_Conductivity_uScm","BGA_PE_RFU",
+              "BGA_PE_ugL","TDS_mg_L","Turbidity_FNU",
+              "Wiper_Position_mv","pH","pH_mv","Temp_C", "Depth_m","Battery_v","Cable_v","Wiper_Current_ma","sn","snn")
+
+head(exo)
+
+#now make a new column from the timestamp 
+# Make sure timestamp is recognized as date + time measured in EST
+exo$TIMESTAMP <- ymd_hms(exo$TIMESTAMP, tz = "EST")
+
+# Add fractional day of year (DOY) column
+exo <- exo %>% mutate(fDOY = as.numeric(julian(exo$TIMESTAMP, julian.date)))
+colnames(exo)[31] <- "fDOY"
+
+exo$Depth_m <- as.numeric(exo$Depth_m)
+exo$Conductivity <- as.numeric(exo$Conductivity)
+
+head(exo)
+
+
+## Plot 
+waterlev <- ggplot(exo, aes(x=TIMESTAMP, y=Depth_m)) + geom_point(color="blue") + ylim(-0.5,2.5) + xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
+     as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) + theme_classic()
+waterlev
+
+## Plot conductivity 
+cond <- ggplot(exo, aes(x=TIMESTAMP, y=Salinity_PPT)) + geom_point(color="purple") + 
+   xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
+     as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) + theme_classic()
+cond
+
+```
+
+## Sontek Data 
+```{r}
+# Load necessary packages 
+library(data.table); library(tidyverse)
+library(readxl); library(lubridate)
+library(ggpubr); library(cowplot)
+library(plotrix)
+
+# Set year,month and date of files being processed
+julian.date='2023-01-01'
+
+#set dropbox wd
+#setwd("C:/Users/wilsonsj/Dropbox (Smithsonian)/GCREW_LOGGERNET_DATA/current_data")
+#setwd("C:/Users/wilsonsj/Dropbox (Smithsonian)/GCREW_LOGGERNET_DATA")
+#setwd("S:/Biogeochemistry/COMPASS Synoptics/2024 Lateral Transport Campaigns/SWH Survey/20240823")
+setwd("C:/Users/wilsonsj/Dropbox (Smithsonian)/GENX2_Mesocosm_Data/current_data")
+
+sontek <- read.table("WILSON_SontekTable.dat", header=TRUE, skip=1, sep= ",")
+sontek <- sontek[-(1:3), ]
+#sontek1 <- read.table("GCREW_MARSH_OUTLET_ExoTable_20230419020031.dat", header=TRUE, skip=3, sep= ",")
+#sontek2 <- read.table("GCREW_MARSH_OUTLET_ExoTable_20230503020034.dat", header=TRUE, skip=3, sep= ",")
+#sontek <- rbind(sontek1, sontek2)
+sontek <- as.tibble(sontek)
+head(sontek)
+
+#colnames(sontek) <- c("TIMESTAMP","RECORD","SONTEK_ID","Sample_number","yyyy","MM","dd","hh","Minute","ss","Flowrate",             "Stage","Mean_velocity","Total_volume","Water_depth","Index_velocity","Cross_area","Water_temperature",                 "System_status","Velocity_XZxc","Velocity_XZzc","Velocity_XZxL","Velocity_XZxR","Batt_Vol_Sontek",                     "Pitch_angle","Roll_angle","Perc_submergance","IceScore","TS","RN","","","","","","","","","m","m","m/s",              "m3","m","m/s","m2","Celsius","unitless","m/s","m/s","m/s","m/s","volts","degrees","degrees","percent",                 "integer")
+#head(sontek)
+
+#now make a new column from the timestamp 
+# Make sure timestamp is recognized as date + time measured in EST
+sontek$TIMESTAMP <- ymd_hms(sontek$TIMESTAMP, tz = "EST")
+
+# Add fractional day of year (DOY) column
+sontek <- sontek %>% mutate(fDOY = as.numeric(julian(sontek$TIMESTAMP, julian.date)))
+colnames(sontek)[29] <- "fDOY"
+
+sontek$Flowrate <- as.numeric(sontek$Flowrate)
+sontek$Water_depth <- as.numeric(sontek$Water_depth)
+head(sontek)
+
+## Plot LGR Data for quick look
+flow <- ggplot(sontek, aes(x=TIMESTAMP, y=Flowrate)) + geom_point(color="black") +       xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
+     as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) + theme_classic()
+flow
+
+flow1 <- ggplot(sontek, aes(x=TIMESTAMP, y=as.numeric(Index_velocity))) + geom_point(color="black") +       
+  xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
+     as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) + theme_classic()
+flow1
+
+sdepth <- ggplot(sontek, aes(x=TIMESTAMP, y=Water_depth)) + geom_point(color="darkblue") +
+    xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
+     as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) + theme_classic()
+sdepth
+```
+
+## FLUX - Licor Data 
+```{r}
+# Load necessary packages 
+library(data.table); library(tidyverse)
+library(readxl); library(lubridate)
+library(ggpubr); library(cowplot)
+library(plotrix)
+
+# Set year,month and date of files being processed
+julian.date='2023-01-01'
+
+#read in the waterlevel data 
+
+#set dropbox wd
+#setwd("C:/Users/wilsonsj/Dropbox (Smithsonian)/GCREW_LOGGERNET_DATA/current_data")
+#setwd("C:/Users/wilsonsj/Dropbox (Smithsonian)/GCREW_LOGGERNET_DATA")
+#setwd("S:/Biogeochemistry/COMPASS Synoptics/2024 Lateral Transport Campaigns/SWH Survey/20240823")
+setwd("C:/Users/wilsonsj/Dropbox (Smithsonian)/GENX2_Mesocosm_Data/current_data")
+
+flux <- read.table("WILSON_FLUX_7810.dat", header=TRUE, skip=1, sep= ",")
+#exo1 <- read.table("GCREW_MARSH_OUTLET_ExoTable_20230419020031.dat", header=TRUE, skip=3, sep= ",")
+#exo2 <- read.table("GCREW_MARSH_OUTLET_ExoTable_20230503020034.dat", header=TRUE, skip=3, sep= ",")
+#exo <- rbind(exo1, exo2)
+
+flux <- flux[-(1:2), ]
+head(flux)
+
+#colnames(exo) <- c("TIMESTAMP","RECORD","Date","Time","Chlorophyll_RFU","Chlorophyll_ugL",
+ #             "Conductivity","FDOM_QSU","FDOM_RFU","NLF_conductivity",
+  #            "ODO_sat","ODO_local", "ODO_MgL","Pressure_psia","Salinity_PPT","Specific_Conductivity_uScm","BGA_PE_RFU",
+            #  "BGA_PE_ugL","TDS_mg_L","Turbidity_FNU",
+             # "Wiper_Position_mv","pH","pH_mv","Temp_C", "Depth_m","Battery_v","Cable_v","Wiper_Current_ma","sn","snn")
+
+#head(exo)
+
+#now make a new column from the timestamp 
+# Make sure timestamp is recognized as date + time measured in EST
+flux$TIMESTAMP1 <- ymd_hms(flux$TIMESTAMP, tz = "EST")
+
+# Add fractional day of year (DOY) column
+#flux <- flux %>% mutate(fDOY = as.numeric(julian(flux$TIMESTAMP, julian.date)))
+#colnames(flux)[27] <- "fDOY"
+
+flux$CH4d_ppmA <- as.numeric(flux$CH4)
+flux$CO2d_ppmA <- as.numeric(flux$CO2)
+
+head(flux)
+
+
+## Plot LGR Data for quick look
+#CH4 
+CH4_lgr <- ggplot(flux, aes(x=TIMESTAMP1, y=CH4d_ppmA)) + geom_point(color="red")+
+    xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
+     as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) + ylim(0,500000)+
+  theme_classic()
+CH4_lgr
+
+#CO2 
+CO2_lgr <- ggplot(flux, aes(x=TIMESTAMP1, y=CO2d_ppmA)) + geom_point(color="darkred")+
+    xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
+     as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) + theme_classic()
+CO2_lgr
+
+
+```
+
+## Radon Data  
+```{r}
+# Load necessary packages 
+library(data.table); library(tidyverse)
+library(readxl); library(lubridate)
+library(ggpubr); library(cowplot)
+library(plotrix)
+
+# Set year,month and date of files being processed
+julian.date='2023-01-01'
+
+#set dropbox wd
+#setwd("C:/Users/wilsonsj/Dropbox (Smithsonian)/GCREW_LOGGERNET_DATA/current_data")
+#setwd("C:/Users/wilsonsj/Dropbox (Smithsonian)/GCREW_LOGGERNET_DATA")
+#setwd("S:/Biogeochemistry/COMPASS Synoptics/2024 Lateral Transport Campaigns/SWH Survey/20240823")
+setwd("C:/Users/wilsonsj/Dropbox (Smithsonian)/GENX2_Mesocosm_Data/current_data")
+
+rad <- read.table("WILSON_Rad7Table.dat", header=TRUE, skip=1, sep= ",")
+#exo1 <- read.table("GCREW_MARSH_OUTLET_ExoTable_20230419020031.dat", header=TRUE, skip=3, sep= ",")
+#exo2 <- read.table("GCREW_MARSH_OUTLET_ExoTable_20230503020034.dat", header=TRUE, skip=3, sep= ",")
+#exo <- rbind(exo1, exo2)
+rad <- rad[-(1:2), ]
+head(rad)
+
+#now make a new column from the timestamp 
+# Make sure timestamp is recognized as date + time measured in EST
+rad$TIMESTAMP <- ymd_hms(rad$TIMESTAMP, tz = "EST")
+
+# Add fractional day of year (DOY) column
+rad <- rad %>% mutate(fDOY = as.numeric(julian(rad$TIMESTAMP, julian.date)))
+colnames(rad)[26] <- "fDOY"
+
+rad$Radon_concentration_Rad7 <- as.numeric(rad$Radon_concentration_Rad7)
+rad$RH_sample_Rad7 <- as.numeric(rad$RH_sample_Rad7)
+head(rad)
+
+
+## Plot LGR Data for quick look
+radon <- ggplot(rad, aes(x=TIMESTAMP, y=Radon_concentration_Rad7)) + 
+  geom_line(color="darkgreen", linewidth=1) +
+    xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
+     as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) + theme_classic() +  
+  ylim(0,400)
+radon
+
+RH  <- ggplot(rad, aes(x=fDOY, y=RH_sample_Rad7)) + geom_point(color="red") + theme_classic()
+RH
+```
+
+## Plot these data up 
+```{r}
+
+All_Data <- ggplot() + 
+    geom_line(data=flux, aes(x=fDOY, y=CO2d_ppm/10, color="CO2"), size=0.75) + 
+    geom_line(data=flux, aes(x=fDOY, y=CH4d_ppm*1, color="CH4"), size=0.75) + 
+    geom_line(data=rad, aes(x=fDOY, y=Radon_concentration_Rad7, color="Radon"), size=0.75) + 
+    #geom_line(data=exo, aes(x=fDOY, y=Depth_m*500), color="red") +
+    scale_color_manual(values = c( "#F29559", "#012A36", "#72BDA3"))+
+    scale_y_continuous(
+    "Radon (Bq/m3) & CH4 (ppm)", limits = c(0,5000),
+    sec.axis = sec_axis(~ . *10, name = "CO2 (ppm)")) + 
+   # xlim(152, 163) + 
+    theme_classic() + 
+    labs(color=NULL)
+All_Data
+
+All_Dat <- ggplot() + 
+   # geom_line(data=flux, aes(x=fDOY, y=CO2d_ppm/10, color="CO2")) + 
+    geom_line(data=flux, aes(x=fDOY, y=CH4d_ppm*1, color="CH4"), size=0.75) + 
+    geom_line(data=rad, aes(x=fDOY, y=Radon_concentration_Rad7, color="Radon"), size=0.75) + 
+    #geom_line(data=exo, aes(x=fDOY, y=Depth_m*500), color="red") +
+    scale_color_manual(values = c("#72BDA3", "#F29559"))+
+    scale_y_continuous(
+    "Radon (Bq/m3) & CH4 (ppm)", limits = c(0,3000)) +  #,
+   # sec.axis = sec_axis(~ . *1, name = "ppm")) + 
+    #xlim(152, 163) + 
+    theme_classic() + 
+    labs(color=NULL)
+All_Dat
+
+
+All_Data1 <- ggplot() + 
+    geom_line(data=exo, aes(x=fDOY, y=Conductivity, color="Conductivity"), size=0.75) + 
+    geom_line(data=sontek, aes(x=fDOY, y=Flowrate*5, color="Flow Rate"), size=0.75) + 
+    geom_line(data=sontek, aes(x=fDOY, y=Water_depth*5, color="Water Depth"), size=0.75) + 
+    #geom_line(data=rad, aes(x=fDOY, y=`Radon [Bq/m3]`), color="blue") + 
+    #geom_line(data=exo, aes(x=fDOY, y=Depth_m*500), color="red") + 
+    scale_color_manual(values = c("#5F464B", "#6BAA75", "#2978A0"))+
+    scale_y_continuous( 
+    "Conductivity (uS/cm)", limits = c(-5,30),
+    sec.axis = sec_axis(~ . /5, name = "Water Depth (m) & Flow Rate (m/s)")) + 
+     #xlim(152, 163) + 
+    theme_classic() + 
+    labs(color=NULL)
+
+All_Data1
+
+```
+
