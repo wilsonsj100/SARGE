@@ -1,0 +1,433 @@
+---
+title: "SARGE Real-Time Data Dashboard"
+author: "Stephanie J. Wilson, Abigail S. L. Lewis"
+title-block-banner: true
+format: 
+  html:
+    page-layout: full
+server: shiny
+---
+
+```{r, message=FALSE, warning=FALSE}
+#| context: setup
+
+#Load packages
+library(shiny)
+library(shinythemes)
+library(tidyverse)
+library(lubridate)
+library(data.table)
+library(DT)
+library(ggpubr)
+library(cowplot)
+library(plotly)
+
+## Load data ##
+#Note that similar code could be used with a LI7820 N2O Analyzer
+#Note this code could be adapted for use with the RAD8 (Durridge)
+
+## EXO DATA ##
+
+#Read in current water quality sonde (EXO2) data from SARGE
+exo <- read.table("Example_Data/WILSON_ExoTable.dat", header=TRUE, skip=3, sep= ",")
+
+#could consider putting these into a csv that then I read in for the EXO to be cleaner... 
+colnames(exo) <- c("TIMESTAMP","RECORD","Date","Time","Chlorophyll_RFU","Chlorophyll_ugL",
+              "Conductivity","FDOM_QSU","FDOM_RFU","NLF_conductivity",
+              "ODO_sat","ODO_local", "ODO_MgL", "Pressure_psia", "Salinity_PPT", 
+              "Specific_Conductivity_uScm", "BGA_PE_RFU", "BGA_PE_ugL",
+              "TDS_mg_L","Turbidity_FNU","Wiper_Position_mv","pH","pH_mv","Temp_C", 
+              "Depth_m","Battery_v","Cable_v","Wiper_Current_ma","sn","snn")
+numeric_columns <- c("RECORD","Chlorophyll_RFU","Chlorophyll_ugL",
+              "Conductivity","FDOM_QSU","FDOM_RFU","NLF_conductivity",
+              "ODO_sat","ODO_local", "ODO_MgL", "Pressure_psia", "Salinity_PPT", 
+              "Specific_Conductivity_uScm", "BGA_PE_RFU", "BGA_PE_ugL",
+              "TDS_mg_L","Turbidity_FNU","Wiper_Position_mv","pH","pH_mv","Temp_C", 
+              "Depth_m","Battery_v","Cable_v","Wiper_Current_ma")
+
+#Add timezone
+exo$TIMESTAMP <- ymd_hms(exo$TIMESTAMP, tz = "EST")
+
+#Ensure that columns that should be numbers are numeric for plotting:
+exo <- exo %>%
+  mutate(across(numeric_columns, as.numeric))
+
+## SONTEK DATA ##
+
+#read in hydrologic data from Sontek IQ (Xylem Analytics)
+sontek <- read.table("Example_Data/WILSON_SontekTable.dat", header=TRUE, skip=1, sep= ",")
+sontek <- sontek[-(1:3), ]
+sontek <- as_tibble(sontek)
+
+#Take a quick look at the tibble created
+head(sontek)
+
+#Add timezone
+sontek$TIMESTAMP <- ymd_hms(sontek$TIMESTAMP, tz = "EST")
+
+#Ensure that columns that should be numbers are numeric for plotting:
+sontek$Flowrate <- as.numeric(sontek$Flowrate)
+sontek$Water_depth <- as.numeric(sontek$Water_depth)
+sontek$Index_velocity <- as.numeric(sontek$Index_velocity)
+
+## FLUX DATA ##
+
+#read in gas concentration data from the LI7810 (LI-COR)
+flux <- read.table("Example_Data/WILSON_FLUX_7810.dat", header=TRUE, skip=1, sep= ",")
+flux <- flux[-(1:2), ]
+
+#Add timezone
+flux$TIMESTAMP <- ymd_hms(flux$TIMESTAMP, tz = "EST")
+
+#Ensure that columns that should be numbers are numeric for plotting:
+flux$CH4d_ppm <- as.numeric(flux$CH4)
+flux$CO2d_ppm <- as.numeric(flux$CO2)
+
+## RAD DATA ##
+
+#read in radon concentration data from the RAD7 (Durridge)
+rad <- read.table("Example_Data/WILSON_Rad7Table.dat", header=TRUE, skip=1, sep= ",")
+rad <- rad[-(1:2), ]
+
+#Add timezone
+rad$TIMESTAMP <- ymd_hms(rad$TIMESTAMP, tz = "EST")
+
+#Ensure that columns that should be numbers are numeric for plotting:
+rad$Radon_concentration_Rad7 <- as.numeric(rad$Radon_concentration_Rad7)
+rad$RH_sample_Rad7 <- as.numeric(rad$RH_sample_Rad7)
+
+## FOR TESTING
+input <- list()
+input$start_date <- as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S")
+input$end_date <- as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S")
+input$exo_vars <- c("Depth_m")
+```
+
+
+## Plot Waterlevel (Depth_m)
+waterlev <- ggplot(exo, aes(x=TIMESTAMP, y=Depth_m)) + 
+  geom_point(color="blue") + 
+  ylim(-0.5,2.5) + 
+  xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
+     as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) + 
+  theme_classic()
+waterlev
+
+## Plot conductivity 
+cond <- ggplot(exo, aes(x=TIMESTAMP, y=Salinity_PPT)) + 
+  geom_point(color="purple") + 
+  xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
+     as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) + 
+  theme_classic()
+cond
+
+vars <- c("Salinity_PPT", "Depth_m")
+exo %>%
+  select(TIMESTAMP, all_of(vars)) %>%
+  pivot_longer(vars) %>%
+  ggplot(aes(x=TIMESTAMP, y=value)) + 
+  geom_point()+
+  xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
+     as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) + 
+  theme_classic()+
+  facet_wrap(~name, scales = "free_y")
+
+## Plot Sontek Flow Data: 
+flow <- ggplot(sontek, aes(x=TIMESTAMP, y=Flowrate)) + 
+  geom_point(color="black") +       
+  xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
+     as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) + 
+  theme_classic()
+flow
+
+## Plot Index Velocity or Water flow Velocity 
+flow1 <- ggplot(sontek, aes(x=TIMESTAMP, y=Index_velocity)) + 
+  geom_point(color="black") +       
+  xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
+     as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) + 
+  theme_classic()
+flow1
+
+## Plot water depth measured by the sontekIQ 
+sdepth <- ggplot(sontek, aes(x=TIMESTAMP, y=Water_depth)) + 
+  geom_point(color="darkblue") +
+  xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
+     as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) + 
+  theme_classic()
+sdepth
+
+## Plot Radon Data
+radon <- ggplot(rad, aes(x=TIMESTAMP, y=Radon_concentration_Rad7)) + 
+  geom_line(color="darkgreen", linewidth=1) +
+  xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
+     as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) + 
+  theme_classic() +  
+  ylim(0,400)
+radon
+
+## Plot relative humidity data to determine desiccant status
+RH  <- ggplot(rad, aes(x=TIMESTAMP, y=RH_sample_Rad7)) + 
+  geom_point(color="red") +
+  xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
+     as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) + 
+  theme_classic()
+RH
+
+## Plot CH4 Data (Note: these are raw concentrations, not in water concentrations)
+ghg_CH4 <- ggplot(flux, aes(x=TIMESTAMP, y=CH4d_ppm)) + 
+  geom_point(color="darkviolet")+
+    xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
+    as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) + 
+  ylim(0,500000)+
+  theme_classic()
+ghg_CH4
+
+## Plot CO2 Data (Note: these are raw concentrations, not in water concentrations)
+ghg_CO2 <- ggplot(flux, aes(x=TIMESTAMP, y=CO2d_ppm)) + 
+  geom_point(color="darkred")+
+    xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
+    as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) + 
+  ylim(0,10000) + 
+  theme_classic()
+ghg_CO2
+
+#Plot Conductivity, Water Velocity, and Water Depth 
+Water_Quality <- ggplot() + 
+    geom_point(data=exo, aes(x=TIMESTAMP, y=Conductivity, color="Conductivity"), size=0.75) + 
+    geom_point(data=sontek, aes(x=TIMESTAMP, y=Index_velocity*5, color="Flow Rate"), size=0.75) + 
+    geom_point(data=sontek, aes(x=TIMESTAMP, y=Water_depth*5, color="Water Depth"), size=0.75) + 
+    scale_color_manual(values = c("#5F464B", "#6BAA75", "#2978A0"))+
+    xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
+     as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) +
+    scale_y_continuous( 
+    "Conductivity (uS/cm)", limits = c(-5,40),
+    sec.axis = sec_axis(~ . /5, name = "Water Depth (m) & Flow Rate (m/s)")) + 
+     #xlim(152, 163) + 
+    theme_classic() + 
+    theme(legend.position = "bottom") + 
+    labs(color=NULL)
+Water_Quality
+
+#Plot the Greenhouse Gas Concentrations together 
+GHGs <- ggplot() + 
+    geom_line(data=flux, aes(x=TIMESTAMP, y=CO2d_ppm, color="CO2"), size=0.75) + 
+    geom_line(data=flux, aes(x=TIMESTAMP, y=CH4d_ppm/10, color="CH4"), size=0.75) + 
+    scale_color_manual(values = c( "darkviolet", "darkred", "black"))+
+    xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
+     as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) +
+    scale_y_continuous(
+    "CO2 (ppm)", limits = c(0,40000),
+    sec.axis = sec_axis(~ . *10, name = "CH4 (ppb)")) + 
+    theme_classic() + 
+    theme(legend.position = "bottom") + 
+    labs(color=NULL)
+GHGs
+
+#Plot Radon and CH4 together 
+Radon_ghg <- ggplot() + 
+    geom_line(data=flux, aes(x=TIMESTAMP, y=CH4d_ppm/100, color="CH4"), size=0.75) + 
+    geom_line(data=rad, aes(x=TIMESTAMP, y=Radon_concentration_Rad7, color="Radon"), size=0.75) + 
+    scale_color_manual(values = c("darkviolet", "darkred", "darkgreen"))+
+     xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
+     as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) +
+    scale_y_continuous(
+    "Radon (Bq/m3)", limits = c(0,4000) ,
+    sec.axis = sec_axis(~ . *100, name = "CH4 (ppm)")) + 
+    theme_classic() + 
+    labs(color=NULL)
+Radon_ghg
+
+ggarrange(Water_Quality, GHGs, ncol=2, nrow=1)
+
+#Plot Conductivity, Water Velocity, and Water Depth 
+Water_Quality1 <- ggplot() + 
+    geom_point(data=exo, aes(x=TIMESTAMP, y=Conductivity, color="Conductivity"), size=0.75) + 
+    geom_point(data=sontek, aes(x=TIMESTAMP, y=Index_velocity*5, color="Flow Rate"), size=0.75) + 
+    geom_point(data=sontek, aes(x=TIMESTAMP, y=Water_depth*5, color="Water Depth"), size=0.75) + 
+    scale_color_manual(values = c("#5F464B", "#6BAA75", "#2978A0"))+
+    xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
+     as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) +
+    scale_y_continuous( 
+    "Conductivity (uS/cm)", limits = c(-5,40),
+    sec.axis = sec_axis(~ . /5, name = "Water Depth (m) & Flow Rate (m/s)")) + 
+    labs(x=" ", title="A")+
+    theme_classic() + 
+    theme(legend.position = "bottom") + 
+    labs(color=NULL)
+
+Water_Quality1
+
+#Plot the Greenhouse Gas Concentrations together 
+GHGs1 <- flux %>%
+  ggplot() + 
+    geom_point(aes(x=TIMESTAMP, y=CO2d_ppm, color="CO2"), size=0.75) + 
+    geom_point(aes(x=TIMESTAMP, y=CH4d_ppm/10, color="CH4"), size=0.75) + 
+    scale_color_manual(values = c( "darkviolet", "darkred", "black"))+
+    xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
+     as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) +
+    scale_y_continuous(
+      name = expression("CO"[2] * " (ppm)"),
+      limits = c(0, 40000),
+      sec.axis = sec_axis(
+        ~ . * 10,
+      name = expression("CH"[4] * " (ppb)"))) + 
+    labs(x=" ", title="B")+
+    theme_classic() + 
+    theme(legend.position = "bottom") + 
+    labs(color=NULL)
+GHGs1
+
+figure <- ggarrange(Water_Quality1, GHGs1, ncol=2, nrow=1)
+figure
+
+#Take a quick look at the dataframe created
+head(flux)
+head(rad)
+head(exo)
+
+
+::: {.row}
+
+::: {.column width="73%"}
+
+::: {.panel-tabset}
+
+## Exo
+
+```{r}
+#| panel: fill
+
+plotlyOutput('plot_exo_dropdown', height = "360px")
+
+plotlyOutput('plot_exo', height = "360px")
+```
+
+## Sontek
+
+```{r}
+#| panel: fill
+
+plotlyOutput('plot_sontek', height = "360px")
+
+```
+
+## Flux
+
+```{r}
+#| panel: fill
+
+plotlyOutput('plot_flux', height = "360px")
+
+```
+
+## Radon
+
+```{r}
+#| panel: fill
+
+plotlyOutput('plot_forecast', height = "360px")
+
+```
+
+:::
+
+:::
+
+::: {.column width="25%"}
+
+```{r}
+#| panel: sidebar
+
+h4("Plot Specifications")
+
+dateInput('start_date', 'Start date', 
+          min = "2024-01-01", 
+          max = Sys.Date(),
+          value = "2024-09-19")
+br()
+dateInput('end_date', 'End date', 
+          min = "2024-01-01", 
+          max = Sys.Date(),
+          value = "2024-09-28")
+br()
+checkboxGroupInput("exo_vars","Exo variables",
+                   choices = colnames(exo)[!colnames(exo) %in% c("TIMESTAMP", "RECORD", "Date", "Time","sn","snn")],
+                   selected = "Depth_m")
+```
+
+:::
+
+:::
+
+```{r}
+#| context: server
+
+#Code for plots
+output$plot_exo <- renderPlotly({
+  exo_recent <- exo %>%
+    filter(as.Date(TIMESTAMP) >= input$start_date,
+           as.Date(TIMESTAMP) <= input$end_date)
+  
+  p1 <- exo_recent %>%
+    ggplot(aes(x=TIMESTAMP, y=Depth_m)) + 
+    geom_point(color="blue", size = 0.2) + 
+    theme_classic()
+  
+  plotly::ggplotly(p1, tooltip=c("TIMESTAMP", "Depth_m"))
+})
+
+output$plot_exo_dropdown <- renderPlotly({
+  exo_recent <- exo %>%
+    filter(as.Date(TIMESTAMP) >= input$start_date,
+           as.Date(TIMESTAMP) <= input$end_date) %>%
+    select(TIMESTAMP, all_of(input$exo_vars)) %>%
+    pivot_longer(input$exo_vars) 
+  
+  p1 <- exo_recent %>%
+    ggplot(aes(x=TIMESTAMP, y=value)) + 
+    geom_point()+
+    theme_classic()+
+    facet_wrap(~name, scales = "free_y")
+  
+  plotly::ggplotly(p1, tooltip=c("TIMESTAMP", "Depth_m"))
+})
+
+output$plot_sontek <- renderPlotly({
+  sontek_recent <- sontek %>%
+    filter(as.Date(TIMESTAMP) >= input$start_date,
+           as.Date(TIMESTAMP) <= input$end_date)
+  
+  p1 <- sontek_recent %>%
+    ggplot(aes(x=TIMESTAMP, y=Flowrate)) + 
+    geom_point(color="black", size = 0.2) + 
+    theme_classic()
+  
+  plotly::ggplotly(p1, tooltip=c("TIMESTAMP", "Flowrate"))
+})
+
+output$plot_flux <- renderPlotly({
+  flux_recent <- flux %>%
+    filter(as.Date(TIMESTAMP) >= input$start_date,
+           as.Date(TIMESTAMP) <= input$end_date)
+  
+  p1 <- flux_recent %>%
+    ggplot(aes(x=TIMESTAMP, y=CH4d_ppm)) + 
+    geom_point(color="maroon", size = 0.2) + 
+    theme_classic()
+  
+  plotly::ggplotly(p1, tooltip=c("TIMESTAMP", "Flowrate"))
+})
+
+output$plot_flux <- renderPlotly({
+  flux_recent <- rad %>%
+    filter(as.Date(TIMESTAMP) >= input$start_date,
+           as.Date(TIMESTAMP) <= input$end_date)
+  
+  p1 <- flux_recent %>%
+    ggplot(aes(x=TIMESTAMP, y=CH4d_ppm)) + 
+    geom_point(color="maroon", size = 0.2) + 
+    theme_classic()
+  
+  plotly::ggplotly(p1, tooltip=c("TIMESTAMP", "Flowrate"))
+})
+```
