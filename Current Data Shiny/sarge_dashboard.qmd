@@ -6,7 +6,7 @@ server: shiny
 
 <style>
 .quarto-title-banner {
-  background-image: url("www/images/GWI_Drone_Photo.png");
+  background-image: url("www/images/DJI_0014.JPG");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -166,9 +166,27 @@ dateInput('end_date', 'End date',
 ```{r}
 #| panel: fill
 
-h3("Latest data")
-htmlOutput("data_latest")
-img(src = "images/GCW_HighTide.png", align = "right")
+div(
+  style = "display:flex; align-items:flex-start; gap:15px;",
+  
+  div(
+    h3("Latest data"),
+    htmlOutput("data_latest")
+  ),
+  
+  div(
+    img(
+      src = "www/images/SARGE_BKGD_SHINY.jpg",
+      style = "width:300px; padding-bottom:10px; ",
+      alt = "SARGE in the field"
+    ),
+    img(
+      src = "www/images/GCW_HighTide.png",
+      style = "width:300px;",
+      alt = "marsh at high tide"
+    )
+  )
+)
 ```
 
 ## Physiochemistry
