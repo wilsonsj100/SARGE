@@ -65,7 +65,10 @@ exo <- read_delim("Example_Data/WILSON_ExoTable.dat",
                   col_names = colnames(exo_names)) %>%
   mutate(TIMESTAMP = paste(format(TIMESTAMP, "%Y-%m-%d %H:%M:%S")),
          TIMESTAMP = ymd_hms(TIMESTAMP, tz = TIMEZONE)) %>%
-  select(-sn, -snn)
+  select(-sn, -snn) %>%
+  rename(DO_mgL = ODO_MgL, 
+         DO_saturation = ODO_sat,
+         TDS_mgL = TDS_mg_L)
 
 ## SONTEK DATA ##
 
@@ -200,8 +203,18 @@ plotlyOutput('plot_exo', height = "400px")
 ```{r}
 #| panel: sidebar
 
+exo_choices <- c("Depth_m", "DO_mgL","pH", "Salinity_PPT", 
+         "Temp_C", "FDOM_RFU", 
+         "Chlorophyll_ugL", 
+         "Conductivity", 
+         "DO_saturation",
+         "Salinity_PPT",
+         "TDS_mgL",
+         "pH",
+         "Temp_C",
+         "Depth_m")
 checkboxGroupInput("exo_vars",h4("Variables to plot"),
-                   choices = colnames(exo)[!colnames(exo) %in% c("TIMESTAMP", "RECORD", "Date", "Time","sn","snn")],
+                   choices = exo_choices,
                    selected = c("Depth_m", "Salinity_PPT"))
 
 ```

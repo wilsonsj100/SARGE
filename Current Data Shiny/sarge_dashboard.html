@@ -114,7 +114,7 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored">Latest data</h3>
 <div id="data_latest" class="shiny-html-output"></div>
 </div>
-<div style="all: unset; display: block;">
+<div>
 <img src="www/images/SARGE_BKGD_SHINY.jpg" style="width:300px; padding-bottom:10px; " alt="SARGE in the field">
 <img src="www/images/GCW_HighTide.png" style="width:300px;" alt="marsh at high tide">
 </div>
@@ -144,8 +144,38 @@ ul.task-list li input[type="checkbox"] {
 <div class="shiny-options-group">
 <div class="checkbox">
 <label>
-<input type="checkbox" name="exo_vars" value="Chlorophyll_RFU">
-<span>Chlorophyll_RFU</span>
+<input type="checkbox" name="exo_vars" value="Depth_m" checked="checked">
+<span>Depth_m</span>
+</label>
+</div>
+<div class="checkbox">
+<label>
+<input type="checkbox" name="exo_vars" value="DO_mgL">
+<span>DO_mgL</span>
+</label>
+</div>
+<div class="checkbox">
+<label>
+<input type="checkbox" name="exo_vars" value="pH">
+<span>pH</span>
+</label>
+</div>
+<div class="checkbox">
+<label>
+<input type="checkbox" name="exo_vars" value="Salinity_PPT" checked="checked">
+<span>Salinity_PPT</span>
+</label>
+</div>
+<div class="checkbox">
+<label>
+<input type="checkbox" name="exo_vars" value="Temp_C">
+<span>Temp_C</span>
+</label>
+</div>
+<div class="checkbox">
+<label>
+<input type="checkbox" name="exo_vars" value="FDOM_RFU">
+<span>FDOM_RFU</span>
 </label>
 </div>
 <div class="checkbox">
@@ -162,44 +192,8 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <div class="checkbox">
 <label>
-<input type="checkbox" name="exo_vars" value="FDOM_QSU">
-<span>FDOM_QSU</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="exo_vars" value="FDOM_RFU">
-<span>FDOM_RFU</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="exo_vars" value="NLF_conductivity">
-<span>NLF_conductivity</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="exo_vars" value="ODO_sat">
-<span>ODO_sat</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="exo_vars" value="ODO_local">
-<span>ODO_local</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="exo_vars" value="ODO_MgL">
-<span>ODO_MgL</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="exo_vars" value="Pressure_psia">
-<span>Pressure_psia</span>
+<input type="checkbox" name="exo_vars" value="DO_saturation">
+<span>DO_saturation</span>
 </label>
 </div>
 <div class="checkbox">
@@ -210,50 +204,14 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <div class="checkbox">
 <label>
-<input type="checkbox" name="exo_vars" value="Specific_Conductivity_uScm">
-<span>Specific_Conductivity_uScm</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="exo_vars" value="BGA_PE_RFU">
-<span>BGA_PE_RFU</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="exo_vars" value="BGA_PE_ugL">
-<span>BGA_PE_ugL</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="exo_vars" value="TDS_mg_L">
-<span>TDS_mg_L</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="exo_vars" value="Turbidity_FNU">
-<span>Turbidity_FNU</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="exo_vars" value="Wiper_Position_mv">
-<span>Wiper_Position_mv</span>
+<input type="checkbox" name="exo_vars" value="TDS_mgL">
+<span>TDS_mgL</span>
 </label>
 </div>
 <div class="checkbox">
 <label>
 <input type="checkbox" name="exo_vars" value="pH">
 <span>pH</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="exo_vars" value="pH_mv">
-<span>pH_mv</span>
 </label>
 </div>
 <div class="checkbox">
@@ -266,24 +224,6 @@ ul.task-list li input[type="checkbox"] {
 <label>
 <input type="checkbox" name="exo_vars" value="Depth_m" checked="checked">
 <span>Depth_m</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="exo_vars" value="Battery_v">
-<span>Battery_v</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="exo_vars" value="Cable_v">
-<span>Cable_v</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="exo_vars" value="Wiper_Current_ma">
-<span>Wiper_Current_ma</span>
 </label>
 </div>
 </div>
@@ -534,7 +474,10 @@ exo <- read_delim("Example_Data/WILSON_ExoTable.dat",
                   col_names = colnames(exo_names)) %>%
   mutate(TIMESTAMP = paste(format(TIMESTAMP, "%Y-%m-%d %H:%M:%S")),
          TIMESTAMP = ymd_hms(TIMESTAMP, tz = TIMEZONE)) %>%
-  select(-sn, -snn)
+  select(-sn, -snn) %>%
+  rename(DO_mgL = ODO_MgL, 
+         DO_saturation = ODO_sat,
+         TDS_mgL = TDS_mg_L)
 
 ## SONTEK DATA ##
 
