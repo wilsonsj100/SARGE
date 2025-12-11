@@ -4,8 +4,31 @@ title-block-banner: true
 server: shiny
 ---
 
+<style>
+.quarto-title-banner {
+  background-image: url("www/images/GWI_Drone_Photo.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  
+  /* Make it taller */
+  min-height: 150px;
+  
+  color: white; 
+}
+
+.quarto-title-banner .title, 
+.quarto-title-banner .subtitle, 
+.quarto-title-banner .author {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6); /* make text readable */
+}
+
+</style>
+
 ```{r, message=FALSE, warning=FALSE}
 #| context: setup
+
+addResourcePath("www", "www")
 
 # TO DO
 # Documentation
@@ -145,7 +168,7 @@ dateInput('end_date', 'End date',
 
 h3("Latest data")
 htmlOutput("data_latest")
-p(img(src = "SARGE_BKGD_SHINY.jpg"))
+img(src = "images/GCW_HighTide.png", align = "right")
 ```
 
 ## Physiochemistry

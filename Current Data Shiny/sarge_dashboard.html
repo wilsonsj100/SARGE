@@ -64,6 +64,26 @@ ul.task-list li input[type="checkbox"] {
 
 
 
+<style>
+.quarto-title-banner {
+  background-image: url("www/images/GWI_Drone_Photo.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  
+  /* Make it taller */
+  min-height: 150px;
+  
+  color: white; 
+}
+
+.quarto-title-banner .title, 
+.quarto-title-banner .subtitle, 
+.quarto-title-banner .author {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6); /* make text readable */
+}
+
+</style>
 <div class="cell panel-input card bg-light p-2 quarto-layout-panel" data-layout-ncol="2" title="Plot specifications">
 <div class="quarto-layout-row">
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
@@ -95,9 +115,7 @@ ul.task-list li input[type="checkbox"] {
 <div id="data_latest" class="shiny-html-output"></div>
 </div>
 <div class="cell-output-display">
-<p>
-<img src="SARGE_BKGD_SHINY.jpg">
-</p>
+<img src="images/GCW_HighTide.png" align="right">
 </div>
 </div>
 </div>
@@ -476,6 +494,8 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <p>
 <script type="application/shiny-prerendered" data-context="server-start">
+addResourcePath("www", "www")
+
 # TO DO
 # Documentation
 
