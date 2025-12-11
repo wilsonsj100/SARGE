@@ -64,7 +64,7 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<div class="cell panel-input card bg-light p-2 quarto-layout-panel" data-layout-ncol="2">
+<div class="cell panel-input card bg-light p-2 quarto-layout-panel" data-layout-ncol="2" title="Plot specifications">
 <div class="quarto-layout-row">
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div id="start_date" class="shiny-date-input form-group shiny-input-container">
@@ -82,7 +82,7 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <div class="row">
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">Overview</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">Exo</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href="">Sontek</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false" href="">Flux</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-5" role="tab" aria-controls="tabset-1-5" aria-selected="false" href="">Radon</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">Overview</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">Physiochemistry</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href="">Hydrology</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false" href="">GHG</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-5" role="tab" aria-controls="tabset-1-5" aria-selected="false" href="">Radon</a></li></ul>
 <div class="tab-content">
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <div class="panel-fill panel-grid">
@@ -93,6 +93,11 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <div class="cell-output-display no-overflow-x">
 <div id="data_latest" class="shiny-html-output"></div>
+</div>
+<div class="cell-output-display">
+<p>
+<img src="SARGE_BKGD_SHINY.jpg">
+</p>
 </div>
 </div>
 </div>
@@ -112,7 +117,9 @@ ul.task-list li input[type="checkbox"] {
 <div class="cell panel-sidebar card bg-light p-2 g-col-24 g-col-lg-7">
 <div class="cell-output-display">
 <div id="exo_vars" class="form-group shiny-input-checkboxgroup shiny-input-container" role="group" aria-labelledby="exo_vars-label">
-<label class="control-label" id="exo_vars-label" for="exo_vars">Exo variables to plot</label>
+<label class="control-label" id="exo_vars-label" for="exo_vars">
+<h4 class="anchored">Variables to plot</h4>
+</label>
 <div class="shiny-options-group">
 <div class="checkbox">
 <label>
@@ -292,114 +299,32 @@ ul.task-list li input[type="checkbox"] {
 <div class="cell panel-sidebar card bg-light p-2 g-col-24 g-col-lg-7">
 <div class="cell-output-display">
 <div id="sontek_vars" class="form-group shiny-input-checkboxgroup shiny-input-container" role="group" aria-labelledby="sontek_vars-label">
-<label class="control-label" id="sontek_vars-label" for="sontek_vars">Sontek variables to plot</label>
+<label class="control-label" id="sontek_vars-label" for="sontek_vars">
+<h4 class="anchored">Variables to plot</h4>
+</label>
 <div class="shiny-options-group">
 <div class="checkbox">
 <label>
-<input type="checkbox" name="sontek_vars" value="Flowrate" checked="checked">
-<span>Flowrate</span>
+<input type="checkbox" name="sontek_vars" value="Water_depth_m" checked="checked">
+<span>Water_depth_m</span>
 </label>
 </div>
 <div class="checkbox">
 <label>
-<input type="checkbox" name="sontek_vars" value="Stage">
-<span>Stage</span>
+<input type="checkbox" name="sontek_vars" value="Flowrate_ms">
+<span>Flowrate_ms</span>
 </label>
 </div>
 <div class="checkbox">
 <label>
-<input type="checkbox" name="sontek_vars" value="Mean_velocity">
-<span>Mean_velocity</span>
+<input type="checkbox" name="sontek_vars" value="Index_velocity_ms" checked="checked">
+<span>Index_velocity_ms</span>
 </label>
 </div>
 <div class="checkbox">
 <label>
-<input type="checkbox" name="sontek_vars" value="Total_volume">
-<span>Total_volume</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="sontek_vars" value="Water_depth" checked="checked">
-<span>Water_depth</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="sontek_vars" value="Index_velocity" checked="checked">
-<span>Index_velocity</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="sontek_vars" value="Cross_area">
-<span>Cross_area</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="sontek_vars" value="Water_temperature">
-<span>Water_temperature</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="sontek_vars" value="System_status">
-<span>System_status</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="sontek_vars" value="Velocity_XZxc">
-<span>Velocity_XZxc</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="sontek_vars" value="Velocity_XZzc">
-<span>Velocity_XZzc</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="sontek_vars" value="Velocity_XZxL">
-<span>Velocity_XZxL</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="sontek_vars" value="Velocity_XZxR">
-<span>Velocity_XZxR</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="sontek_vars" value="Batt_Vol_Sontek">
-<span>Batt_Vol_Sontek</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="sontek_vars" value="Pitch_angle">
-<span>Pitch_angle</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="sontek_vars" value="Roll_angle">
-<span>Roll_angle</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="sontek_vars" value="Perc_submergance">
-<span>Perc_submergance</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="sontek_vars" value="IceScore">
-<span>IceScore</span>
+<input type="checkbox" name="sontek_vars" value="Mean_velocity_ms">
+<span>Mean_velocity_ms</span>
 </label>
 </div>
 </div>
@@ -436,24 +361,14 @@ ul.task-list li input[type="checkbox"] {
 <div class="cell panel-sidebar card bg-light p-2 g-col-24 g-col-lg-7">
 <div class="cell-output-display">
 <div id="flux_vars" class="form-group shiny-input-checkboxgroup shiny-input-container" role="group" aria-labelledby="flux_vars-label">
-<label class="control-label" id="flux_vars-label" for="flux_vars">Flux variables to plot</label>
+<label class="control-label" id="flux_vars-label" for="flux_vars">
+<h4 class="anchored">Variables to plot</h4>
+</label>
 <div class="shiny-options-group">
 <div class="checkbox">
 <label>
-<input type="checkbox" name="flux_vars" value="NDX">
-<span>NDX</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="Diag">
-<span>Diag</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="H2O">
-<span>H2O</span>
+<input type="checkbox" name="flux_vars" value="H2O_ppm">
+<span>H2O_ppm</span>
 </label>
 </div>
 <div class="checkbox">
@@ -464,248 +379,20 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <div class="checkbox">
 <label>
-<input type="checkbox" name="flux_vars" value="CH4d_ppm" checked="checked">
-<span>CH4d_ppm</span>
+<input type="checkbox" name="flux_vars" value="CH4d_ppb" checked="checked">
+<span>CH4d_ppb</span>
 </label>
 </div>
 <div class="checkbox">
 <label>
-<input type="checkbox" name="flux_vars" value="cavity_p">
-<span>cavity_p</span>
+<input type="checkbox" name="flux_vars" value="Cavity_pressure">
+<span>Cavity_pressure</span>
 </label>
 </div>
 <div class="checkbox">
 <label>
-<input type="checkbox" name="flux_vars" value="cavity_t">
-<span>cavity_t</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="laser_phase_p">
-<span>laser_phase_p</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="laser_t">
-<span>laser_t</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="residual">
-<span>residual</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="ringdown">
-<span>ringdown</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="thermal_enc_t">
-<span>thermal_enc_t</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="phase_err">
-<span>phase_err</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="laser_t_shift">
-<span>laser_t_shift</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="vin">
-<span>vin</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="cavity_p_sp">
-<span>cavity_p_sp</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="board_t">
-<span>board_t</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="case_t">
-<span>case_t</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="exfit_tau_rd1">
-<span>exfit_tau_rd1</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="peak_ht_1">
-<span>peak_ht_1</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="exfit_tau_rd2">
-<span>exfit_tau_rd2</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="peak_ht_2">
-<span>peak_ht_2</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="tec_sp">
-<span>tec_sp</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="phase_ctrl_out">
-<span>phase_ctrl_out</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="meas_phase">
-<span>meas_phase</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="laser_phase_sp">
-<span>laser_phase_sp</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="num_peaks_win">
-<span>num_peaks_win</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="post_ringdwn_1_ign_len">
-<span>post_ringdwn_1_ign_len</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="ringdwn_1_loc">
-<span>ringdwn_1_loc</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="peak_x0">
-<span>peak_x0</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="xderiv_weight">
-<span>xderiv_weight</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="xderiv2_weight">
-<span>xderiv2_weight</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="ch4_spec_weight">
-<span>ch4_spec_weight</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="co2_spec_weight">
-<span>co2_spec_weight</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="h2o_spec_weight">
-<span>h2o_spec_weight</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="start_freq">
-<span>start_freq</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="cavity_htr_w">
-<span>cavity_htr_w</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="laser_ref_pwr">
-<span>laser_ref_pwr</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="offset_weight">
-<span>offset_weight</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="slope_weight">
-<span>slope_weight</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="evenodd_weight">
-<span>evenodd_weight</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="evenodd_lin_weight">
-<span>evenodd_lin_weight</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="num_skipped_modes">
-<span>num_skipped_modes</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="pump_sp">
-<span>pump_sp</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="flux_vars" value="pump_tach_ph">
-<span>pump_tach_ph</span>
+<input type="checkbox" name="flux_vars" value="Cavity_temperature">
+<span>Cavity_temperature</span>
 </label>
 </div>
 </div>
@@ -742,144 +429,26 @@ ul.task-list li input[type="checkbox"] {
 <div class="cell panel-sidebar card bg-light p-2 g-col-24 g-col-lg-7">
 <div class="cell-output-display">
 <div id="rad_vars" class="form-group shiny-input-checkboxgroup shiny-input-container" role="group" aria-labelledby="rad_vars-label">
-<label class="control-label" id="rad_vars-label" for="rad_vars">Rad7 variables to plot</label>
+<label class="control-label" id="rad_vars-label" for="rad_vars">
+<h4 class="anchored">Variables to plot</h4>
+</label>
 <div class="shiny-options-group">
 <div class="checkbox">
 <label>
-<input type="checkbox" name="rad_vars" value="TimeLong7810">
-<span>TimeLong7810</span>
+<input type="checkbox" name="rad_vars" value="Relative_humidity_pct">
+<span>Relative_humidity_pct</span>
 </label>
 </div>
 <div class="checkbox">
 <label>
-<input type="checkbox" name="rad_vars" value="LI7810_time">
-<span>LI7810_time</span>
+<input type="checkbox" name="rad_vars" value="Radon_Bqm3" checked="checked">
+<span>Radon_Bqm3</span>
 </label>
 </div>
 <div class="checkbox">
 <label>
-<input type="checkbox" name="rad_vars" value="Seconds">
-<span>Seconds</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="rad_vars" value="Nanoseconds">
-<span>Nanoseconds</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="rad_vars" value="NDX">
-<span>NDX</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="rad_vars" value="Diag">
-<span>Diag</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="rad_vars" value="H2O">
-<span>H2O</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="rad_vars" value="CO2">
-<span>CO2</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="rad_vars" value="CH4">
-<span>CH4</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="rad_vars" value="cavity_p">
-<span>cavity_p</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="rad_vars" value="cavity_t">
-<span>cavity_t</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="rad_vars" value="laser_phase_p">
-<span>laser_phase_p</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="rad_vars" value="laser_t">
-<span>laser_t</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="rad_vars" value="residual">
-<span>residual</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="rad_vars" value="ringdown">
-<span>ringdown</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="rad_vars" value="thermal_enc_t">
-<span>thermal_enc_t</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="rad_vars" value="phase_err">
-<span>phase_err</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="rad_vars" value="laser_t_shift">
-<span>laser_t_shift</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="rad_vars" value="vin">
-<span>vin</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="rad_vars" value="cavity_p_sp">
-<span>cavity_p_sp</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="rad_vars" value="board_t">
-<span>board_t</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="rad_vars" value="case_t">
-<span>case_t</span>
-</label>
-</div>
-<div class="checkbox">
-<label>
-<input type="checkbox" name="rad_vars" value="exfit_tau_rd1">
-<span>exfit_tau_rd1</span>
+<input type="checkbox" name="rad_vars" value="Radon_error_Bqm3" checked="checked">
+<span>Radon_error_Bqm3</span>
 </label>
 </div>
 </div>
@@ -909,8 +478,6 @@ ul.task-list li input[type="checkbox"] {
 <script type="application/shiny-prerendered" data-context="server-start">
 # TO DO
 # Documentation
-# Some variables are not numeric
-
 
 #Load packages
 library(shiny)
@@ -943,7 +510,8 @@ exo <- read_delim("Example_Data/WILSON_ExoTable.dat",
                         delim = ",", skip = 4, show_col_types = F,
                   col_names = colnames(exo_names)) %>%
   mutate(TIMESTAMP = paste(format(TIMESTAMP, "%Y-%m-%d %H:%M:%S")),
-         TIMESTAMP = ymd_hms(TIMESTAMP, tz = TIMEZONE))
+         TIMESTAMP = ymd_hms(TIMESTAMP, tz = TIMEZONE)) %>%
+  select(-sn, -snn)
 
 ## SONTEK DATA ##
 
@@ -956,7 +524,11 @@ sontek <- read_delim("Example_Data/WILSON_SontekTable.dat",
                         delim = ",", skip = 4, show_col_types = F,
                   col_names = colnames(sontek_names)) %>%
   mutate(TIMESTAMP = paste(format(TIMESTAMP, "%Y-%m-%d %H:%M:%S")),
-         TIMESTAMP = ymd_hms(TIMESTAMP, tz = TIMEZONE))
+         TIMESTAMP = ymd_hms(TIMESTAMP, tz = TIMEZONE)) %>%
+  rename(Water_depth_m = Water_depth,
+         Index_velocity_ms = Index_velocity,
+         Mean_velocity_ms = Mean_velocity,
+         Flowrate_ms = Flowrate)
 
 ## FLUX DATA ##
 
@@ -970,8 +542,14 @@ flux <- read_delim("Example_Data/WILSON_FLUX_7810.dat",
                   col_names = colnames(flux_names)) %>%
   mutate(TIMESTAMP = paste(format(TIMESTAMP, "%Y-%m-%d %H:%M:%S")),
          TIMESTAMP = ymd_hms(TIMESTAMP, tz = TIMEZONE)) %>%
-  rename(CH4d_ppm = CH4,
-         CO2d_ppm = CO2)
+  rename(CH4d_ppb = CH4,
+         CO2d_ppm = CO2,
+         H2O_ppm = H2O,
+         Cavity_pressure = cavity_p,
+         Cavity_temperature = cavity_t) %>%
+  mutate(TIMESTAMP = round_date(TIMESTAMP, "minute")) %>%
+  group_by(TIMESTAMP) %>%
+  summarize(across(everything(), ~mean(.x, na.rm = T)))
 
 ## RADON DATA ##
 
@@ -982,9 +560,12 @@ radon_names <- read_delim("Example_Data/WILSON_Rad7Table.dat",
 #Load data
 radon <- read_delim("Example_Data/WILSON_Rad7Table.dat", 
                         delim = ",", skip = 4, show_col_types = F,
-                  col_names = colnames(flux_names)) %>%
+                  col_names = colnames(radon_names)) %>%
   mutate(TIMESTAMP = paste(format(TIMESTAMP, "%Y-%m-%d %H:%M:%S")),
-         TIMESTAMP = ymd_hms(TIMESTAMP, tz = TIMEZONE))
+         TIMESTAMP = ymd_hms(TIMESTAMP, tz = TIMEZONE)) %>%
+  rename(Relative_humidity_pct = RH_sample_Rad7,
+         Radon_Bqm3 = Radon_concentration_Rad7,
+         Radon_error_Bqm3 = Radon_concentration_uncertainty_Rad7)
 
 ## FOR TESTING
 input <- list()
@@ -1017,11 +598,12 @@ output$plot_exo <- renderPlotly({
     pivot_longer(input$exo_vars) 
   
   p1 <- exo_recent %>%
-    ggplot(aes(x=TIMESTAMP, y=value)) + 
+    ggplot(aes(x=TIMESTAMP, y=value, color = name)) + 
     geom_point(size = 0.3)+
     theme_classic()+
     facet_wrap(~name, scales = "free_y")+
-    theme(axis.title.x = element_blank())
+    theme(axis.title.x = element_blank(),
+          legend.position = "none")
   
   plotly::ggplotly(p1, tooltip=c("TIMESTAMP", "value"))
 })
@@ -1034,11 +616,12 @@ output$plot_sontek <- renderPlotly({
     pivot_longer(input$sontek_vars) 
   
   p1 <- sontek_recent %>%
-    ggplot(aes(x=TIMESTAMP, y=value)) + 
+    ggplot(aes(x=TIMESTAMP, y=value, color = name)) + 
     geom_point(size = 0.3)+
     theme_classic()+
     facet_wrap(~name, scales = "free_y")+
-    theme(axis.title.x = element_blank())
+    theme(axis.title.x = element_blank(),
+          legend.position = "none")
   
   plotly::ggplotly(p1, tooltip=c("TIMESTAMP", "value"))
 })
@@ -1051,11 +634,12 @@ output$plot_flux <- renderPlotly({
     pivot_longer(input$flux_vars) 
   
   p1 <- flux_recent %>%
-    ggplot(aes(x=TIMESTAMP, y=value)) + 
+    ggplot(aes(x=TIMESTAMP, y=value, color = name)) + 
     geom_point(size = 0.3)+
     theme_classic()+
     facet_wrap(~name, scales = "free_y")+
-    theme(axis.title.x = element_blank())
+    theme(axis.title.x = element_blank(),
+          legend.position = "none")
   
   plotly::ggplotly(p1, tooltip=c("TIMESTAMP", "value"))
 })
@@ -1068,11 +652,12 @@ output$plot_radon <- renderPlotly({
     pivot_longer(input$rad_vars) 
   
   p1 <- rad_recent %>%
-    ggplot(aes(x=TIMESTAMP, y=value)) + 
+    ggplot(aes(x=TIMESTAMP, y=value, color = name)) + 
     geom_point(size = 0.3)+
     theme_classic()+
     facet_wrap(~name, scales = "free_y")+
-    theme(axis.title.x = element_blank())
+    theme(axis.title.x = element_blank(),
+          legend.position = "none")
   
   plotly::ggplotly(p1, tooltip=c("TIMESTAMP", "value"))
 })
@@ -1110,10 +695,10 @@ output$data_latest <- renderText({
                                  "%Y-%m-%d %H:%M:%S"), 
                           TIMEZONE)
   formatted_list <- paste(
-    "<ul><li><b>Exo:<\u002fb> ", formatted_date_exo, "<\u002fli>
-    <li><b>Sontek:<\u002fb> ", formatted_date_sontek, "<\u002fli>
-    <li><b>Flux:<\u002fb> ", formatted_date_flux, "<\u002fli>
-    <li><b>Radon:<\u002fb> ", formatted_date_rad, "<\u002fli><\u002ful>")
+    "<ul><li><b>EXO2 water quality sonde:<\u002fb> ", formatted_date_exo, "<\u002fli>
+    <li><b>SontekIQ ADCP:<\u002fb> ", formatted_date_sontek, "<\u002fli>
+    <li><b>GHG analyzer:<\u002fb> ", formatted_date_flux, "<\u002fli>
+    <li><b>Radon detector:<\u002fb> ", formatted_date_rad, "<\u002fli><\u002ful>")
   
   return(formatted_list)
   })

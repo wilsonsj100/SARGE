@@ -9,8 +9,6 @@ server: shiny
 
 # TO DO
 # Documentation
-# Some variables are not numeric
-
 
 #Load packages
 library(shiny)
@@ -43,7 +41,8 @@ exo <- read_delim("Example_Data/WILSON_ExoTable.dat",
                         delim = ",", skip = 4, show_col_types = F,
                   col_names = colnames(exo_names)) %>%
   mutate(TIMESTAMP = paste(format(TIMESTAMP, "%Y-%m-%d %H:%M:%S")),
-         TIMESTAMP = ymd_hms(TIMESTAMP, tz = TIMEZONE))
+         TIMESTAMP = ymd_hms(TIMESTAMP, tz = TIMEZONE)) %>%
+  select(-sn, -snn)
 
 ## SONTEK DATA ##
 
@@ -56,7 +55,11 @@ sontek <- read_delim("Example_Data/WILSON_SontekTable.dat",
                         delim = ",", skip = 4, show_col_types = F,
                   col_names = colnames(sontek_names)) %>%
   mutate(TIMESTAMP = paste(format(TIMESTAMP, "%Y-%m-%d %H:%M:%S")),
-         TIMESTAMP = ymd_hms(TIMESTAMP, tz = TIMEZONE))
+         TIMESTAMP = ymd_hms(TIMESTAMP, tz = TIMEZONE)) %>%
+  rename(Water_depth_m = Water_depth,
+         Index_velocity_ms = Index_velocity,
+         Mean_velocity_ms = Mean_velocity,
+         Flowrate_ms = Flowrate)
 
 ## FLUX DATA ##
 
@@ -70,8 +73,14 @@ flux <- read_delim("Example_Data/WILSON_FLUX_7810.dat",
                   col_names = colnames(flux_names)) %>%
   mutate(TIMESTAMP = paste(format(TIMESTAMP, "%Y-%m-%d %H:%M:%S")),
          TIMESTAMP = ymd_hms(TIMESTAMP, tz = TIMEZONE)) %>%
-  rename(CH4d_ppm = CH4,
-         CO2d_ppm = CO2)
+  rename(CH4d_ppb = CH4,
+         CO2d_ppm = CO2,
+         H2O_ppm = H2O,
+         Cavity_pressure = cavity_p,
+         Cavity_temperature = cavity_t) %>%
+  mutate(TIMESTAMP = round_date(TIMESTAMP, "minute")) %>%
+  group_by(TIMESTAMP) %>%
+  summarize(across(everything(), ~mean(.x, na.rm = T)))
 
 ## RADON DATA ##
 
@@ -82,9 +91,12 @@ radon_names <- read_delim("Example_Data/WILSON_Rad7Table.dat",
 #Load data
 radon <- read_delim("Example_Data/WILSON_Rad7Table.dat", 
                         delim = ",", skip = 4, show_col_types = F,
-                  col_names = colnames(flux_names)) %>%
+                  col_names = colnames(radon_names)) %>%
   mutate(TIMESTAMP = paste(format(TIMESTAMP, "%Y-%m-%d %H:%M:%S")),
-         TIMESTAMP = ymd_hms(TIMESTAMP, tz = TIMEZONE))
+         TIMESTAMP = ymd_hms(TIMESTAMP, tz = TIMEZONE)) %>%
+  rename(Relative_humidity_pct = RH_sample_Rad7,
+         Radon_Bqm3 = Radon_concentration_Rad7,
+         Radon_error_Bqm3 = Radon_concentration_uncertainty_Rad7)
 
 ## FOR TESTING
 input <- list()
@@ -110,7 +122,7 @@ max_date <- max(c(exo$TIMESTAMP,
 ```{r}
 #| panel: input
 #| layout-ncol: 2
-
+#| title: "Plot specifications"
 dateInput('start_date', 'Start date', 
           min = min_date, 
           max = max_date,
@@ -133,9 +145,10 @@ dateInput('end_date', 'End date',
 
 h3("Latest data")
 htmlOutput("data_latest")
+p(img(src = "SARGE_BKGD_SHINY.jpg"))
 ```
 
-## Exo
+## Physiochemistry
 
 ```{r}
 #| panel: fill
@@ -146,7 +159,7 @@ plotlyOutput('plot_exo', height = "400px")
 ```{r}
 #| panel: sidebar
 
-checkboxGroupInput("exo_vars","Exo variables to plot",
+checkboxGroupInput("exo_vars",h4("Variables to plot"),
                    choices = colnames(exo)[!colnames(exo) %in% c("TIMESTAMP", "RECORD", "Date", "Time","sn","snn")],
                    selected = c("Depth_m", "Salinity_PPT"))
 
@@ -159,7 +172,7 @@ h3("Table of all exo data")
 div(DT::dataTableOutput("table_exo"), style = "font-size:80%")
 ```
 
-## Sontek
+## Hydrology
 
 ```{r}
 #| panel: fill
@@ -170,9 +183,10 @@ plotlyOutput('plot_sontek', height = "360px")
 ```{r}
 #| panel: sidebar
 
-checkboxGroupInput("sontek_vars","Sontek variables to plot",
-                   choices = colnames(sontek)[!colnames(sontek) %in% c("TIMESTAMP", "RECORD", "SONTEK_ID", "Sample_number","yyyy","MM", "dd", "hh", "Minute", "ss")],
-                   selected = c("Flowrate", "Index_velocity", "Water_depth"))
+sontek_choices <- c("Water_depth_m", "Flowrate_ms", "Index_velocity_ms", "Mean_velocity_ms")
+checkboxGroupInput("sontek_vars",h4("Variables to plot"),
+                   choices = sontek_choices,
+                   selected = c("Water_depth_m", "Index_velocity_ms"))
 
 ```
 
@@ -183,7 +197,7 @@ h3("Table of all sontek data")
 div(DT::dataTableOutput("table_sontek"), style = "font-size:80%")
 ```
 
-## Flux
+## GHG
 
 ```{r}
 #| panel: fill
@@ -194,9 +208,11 @@ plotlyOutput('plot_flux', height = "360px")
 ```{r}
 #| panel: sidebar
 
-checkboxGroupInput("flux_vars","Flux variables to plot",
-                   choices = colnames(flux)[!colnames(flux) %in% c("TIMESTAMP", "RECORD", "TimeLong7810", "LI7810_time","Seconds","Nanoseconds")],
-                   selected = c("CH4d_ppm", "CO2d_ppm"))
+flux_choices <- c("H2O_ppm", "CO2d_ppm", "CH4d_ppb", "Cavity_pressure", 
+                  "Cavity_temperature")
+checkboxGroupInput("flux_vars",h4("Variables to plot"),
+                   choices = flux_choices,
+                   selected = c("CH4d_ppb", "CO2d_ppm"))
 ```
 
 ```{r}
@@ -217,9 +233,10 @@ plotlyOutput('plot_radon', height = "360px")
 ```{r}
 #| panel: sidebar
 
-checkboxGroupInput("rad_vars","Rad7 variables to plot",
-                   choices = colnames(radon)[!colnames(radon) %in% c("TIMESTAMP", "RECORD", "RECORD_RAD7", "Year_RAD7","Month_RAD7","Day_Rad7", "Hour_Rad7", "Minute_Rad7")],
-                   selected = c("Radon_concentration_Rad7", "RH_sample_Rad7"))
+radon_choices <- c("Relative_humidity_pct", "Radon_Bqm3", "Radon_error_Bqm3")
+checkboxGroupInput("rad_vars",h4("Variables to plot"),
+                   choices = radon_choices,
+                   selected = c("Radon_Bqm3", "Radon_error_Bqm3"))
 
 ```
 
@@ -246,11 +263,12 @@ output$plot_exo <- renderPlotly({
     pivot_longer(input$exo_vars) 
   
   p1 <- exo_recent %>%
-    ggplot(aes(x=TIMESTAMP, y=value)) + 
+    ggplot(aes(x=TIMESTAMP, y=value, color = name)) + 
     geom_point(size = 0.3)+
     theme_classic()+
     facet_wrap(~name, scales = "free_y")+
-    theme(axis.title.x = element_blank())
+    theme(axis.title.x = element_blank(),
+          legend.position = "none")
   
   plotly::ggplotly(p1, tooltip=c("TIMESTAMP", "value"))
 })
@@ -263,11 +281,12 @@ output$plot_sontek <- renderPlotly({
     pivot_longer(input$sontek_vars) 
   
   p1 <- sontek_recent %>%
-    ggplot(aes(x=TIMESTAMP, y=value)) + 
+    ggplot(aes(x=TIMESTAMP, y=value, color = name)) + 
     geom_point(size = 0.3)+
     theme_classic()+
     facet_wrap(~name, scales = "free_y")+
-    theme(axis.title.x = element_blank())
+    theme(axis.title.x = element_blank(),
+          legend.position = "none")
   
   plotly::ggplotly(p1, tooltip=c("TIMESTAMP", "value"))
 })
@@ -280,11 +299,12 @@ output$plot_flux <- renderPlotly({
     pivot_longer(input$flux_vars) 
   
   p1 <- flux_recent %>%
-    ggplot(aes(x=TIMESTAMP, y=value)) + 
+    ggplot(aes(x=TIMESTAMP, y=value, color = name)) + 
     geom_point(size = 0.3)+
     theme_classic()+
     facet_wrap(~name, scales = "free_y")+
-    theme(axis.title.x = element_blank())
+    theme(axis.title.x = element_blank(),
+          legend.position = "none")
   
   plotly::ggplotly(p1, tooltip=c("TIMESTAMP", "value"))
 })
@@ -297,11 +317,12 @@ output$plot_radon <- renderPlotly({
     pivot_longer(input$rad_vars) 
   
   p1 <- rad_recent %>%
-    ggplot(aes(x=TIMESTAMP, y=value)) + 
+    ggplot(aes(x=TIMESTAMP, y=value, color = name)) + 
     geom_point(size = 0.3)+
     theme_classic()+
     facet_wrap(~name, scales = "free_y")+
-    theme(axis.title.x = element_blank())
+    theme(axis.title.x = element_blank(),
+          legend.position = "none")
   
   plotly::ggplotly(p1, tooltip=c("TIMESTAMP", "value"))
 })
@@ -339,10 +360,10 @@ output$data_latest <- renderText({
                                  "%Y-%m-%d %H:%M:%S"), 
                           TIMEZONE)
   formatted_list <- paste(
-    "<ul><li><b>Exo:</b> ", formatted_date_exo, "</li>
-    <li><b>Sontek:</b> ", formatted_date_sontek, "</li>
-    <li><b>Flux:</b> ", formatted_date_flux, "</li>
-    <li><b>Radon:</b> ", formatted_date_rad, "</li></ul>")
+    "<ul><li><b>EXO2 water quality sonde:</b> ", formatted_date_exo, "</li>
+    <li><b>SontekIQ ADCP:</b> ", formatted_date_sontek, "</li>
+    <li><b>GHG analyzer:</b> ", formatted_date_flux, "</li>
+    <li><b>Radon detector:</b> ", formatted_date_rad, "</li></ul>")
   
   return(formatted_list)
   })
