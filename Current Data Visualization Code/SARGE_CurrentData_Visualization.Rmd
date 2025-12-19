@@ -245,11 +245,12 @@ Water_Quality1 <- ggplot() +
     xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
      as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) +
     scale_y_continuous( 
-    "Conductivity (uS/cm)", limits = c(-5,40),
+    "Conductivity (uS/cm)", limits = c(-5,40), #μ
     sec.axis = sec_axis(~ . /5, name = "Water Depth (m) & Flow Rate (m/s)")) + 
     labs(x=" ", title="A")+
     theme_classic() + 
-    theme(legend.position = "bottom") + 
+    guides(color = guide_legend(override.aes = list(size = 5))) +
+    theme(legend.position = "bottom", legend.text = element_text(size = 12)) + 
     labs(color=NULL)
 
 Water_Quality1
@@ -258,7 +259,9 @@ Water_Quality1
 GHGs1 <- ggplot() + 
     geom_point(data=flux, aes(x=TIMESTAMP1, y=CO2d_ppm, color="CO2"), size=0.75) + 
     geom_point(data=flux, aes(x=TIMESTAMP1, y=CH4d_ppm/10, color="CH4"), size=0.75) + 
-    scale_color_manual(values = c( "darkviolet", "darkred", "black"))+
+    scale_color_manual(values = c( "darkviolet", "darkred"),
+    labels = c("CO2" = expression(CO[2]), 
+               "CH4" = expression(CH[4])) )+
     xlim(c(as.POSIXct('2024-09-19 00:00:00', format = "%Y-%m-%d %H:%M:%S"),
      as.POSIXct('2024-09-28 00:00:00', format = "%Y-%m-%d %H:%M:%S"))) +
     scale_y_continuous(
@@ -269,7 +272,8 @@ GHGs1 <- ggplot() +
       name = expression("CH"[4] * " (ppb)"))) + 
     labs(x=" ", title="B")+
     theme_classic() + 
-    theme(legend.position = "bottom") + 
+    guides(color = guide_legend(override.aes = list(size = 5))) +
+    theme(legend.position = "bottom", legend.text = element_text(size = 12)) + 
     labs(color=NULL)
 GHGs1
 
