@@ -51,11 +51,11 @@ TIMEZONE = "EST" #Used across all
 
 #Read in current water quality sonde (EXO2) data from SARGE
 #Set exo column names
-exo_names <- read_delim("Example_Data/WILSON_ExoTable.dat", 
+exo_names <- read_delim("https://www.dropbox.com/scl/fi/0l884zjlaphi2nu9uupiw/WILSON_ExoTable.dat?rlkey=3ydvfbetag118ql5a03f3o9l8&st=80wnki57&dl=1", 
                         delim = ",", skip = 1, show_col_types = F, n_max = 1)
 
 #Load data
-exo <- read_delim("Example_Data/WILSON_ExoTable.dat", 
+exo <- read_delim("https://www.dropbox.com/scl/fi/0l884zjlaphi2nu9uupiw/WILSON_ExoTable.dat?rlkey=3ydvfbetag118ql5a03f3o9l8&st=80wnki57&dl=1", 
                         delim = ",", skip = 4, show_col_types = F,
                   col_names = colnames(exo_names)) %>%
   mutate(TIMESTAMP = paste(format(TIMESTAMP, "%Y-%m-%d %H:%M:%S")),
@@ -79,11 +79,11 @@ exo_colors <- c("Depth_m" = "darkblue",
 ## hydrology DATA ##
 
 #read in hydrologic data from hydrology IQ (Xylem Analytics)
-hydrology_names <- read_delim("Example_Data/WILSON_SontekTable.dat", 
+hydrology_names <- read_delim("https://www.dropbox.com/scl/fi/dqas4e92ngcsigqy7u107/WILSON_SontekTable.dat?rlkey=iw6azl1fqyyl521jpcgfjjcrk&st=d4xp83p3&dl=1", 
                         delim = ",", skip = 1, show_col_types = F, n_max = 1)
 
 #Load data
-hydrology <- read_delim("Example_Data/WILSON_SontekTable.dat", 
+hydrology <- read_delim("https://www.dropbox.com/scl/fi/dqas4e92ngcsigqy7u107/WILSON_SontekTable.dat?rlkey=iw6azl1fqyyl521jpcgfjjcrk&st=d4xp83p3&dl=1", 
                         delim = ",", skip = 4, show_col_types = F,
                   col_names = colnames(hydrology_names)) %>%
   mutate(TIMESTAMP = paste(format(TIMESTAMP, "%Y-%m-%d %H:%M:%S")),
@@ -101,11 +101,11 @@ hydrology_colors <- c("Water_depth_m" = "darkblue",
 ## GHG DATA ##
 
 #read in gas concentration data from the LI7810 (LI-COR)
-ghg_names <- read_delim("Example_Data/WILSON_FLUX_7810.dat", 
+ghg_names <- read_delim("https://www.dropbox.com/scl/fi/5mbm233tpfzjzwuxwqqfq/WILSON_FLUX_7810.dat?rlkey=7283hbfameqbscbdvriyx8sml&st=4jl7y7z6&dl=1", 
                         delim = ",", skip = 1, show_col_types = F, n_max = 1)
 
 #Load data
-ghg <- read_delim("Example_Data/WILSON_FLUX_7810.dat", 
+ghg <- read_delim("https://www.dropbox.com/scl/fi/5mbm233tpfzjzwuxwqqfq/WILSON_FLUX_7810.dat?rlkey=7283hbfameqbscbdvriyx8sml&st=4jl7y7z6&dl=1", 
                         delim = ",", skip = 4, show_col_types = F,
                   col_names = colnames(ghg_names)) %>%
   mutate(TIMESTAMP = paste(format(TIMESTAMP, "%Y-%m-%d %H:%M:%S")),
@@ -128,11 +128,11 @@ ghg_colors <- c("H2O_ppm" = "lightblue",
 ## RADON DATA ##
 
 #read in radon concentration data from the RAD7 (Durridge)
-radon_names <- read_delim("Example_Data/WILSON_Rad7Table.dat", 
+radon_names <- read_delim("https://www.dropbox.com/scl/fi/ttjde8cpqf7xgn8dgcdv2/WILSON_Rad7Table.dat?rlkey=hcg2ycle3cmkerc6ic7pa13g1&st=vx91f41x&dl=1", 
                         delim = ",", skip = 1, show_col_types = F, n_max = 1)
 
 #Load data
-radon <- read_delim("Example_Data/WILSON_Rad7Table.dat", 
+radon <- read_delim("https://www.dropbox.com/scl/fi/ttjde8cpqf7xgn8dgcdv2/WILSON_Rad7Table.dat?rlkey=hcg2ycle3cmkerc6ic7pa13g1&st=vx91f41x&dl=1", 
                         delim = ",", skip = 4, show_col_types = F,
                   col_names = colnames(radon_names)) %>%
   mutate(TIMESTAMP = paste(format(TIMESTAMP, "%Y-%m-%d %H:%M:%S")),
