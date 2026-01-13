@@ -46,24 +46,6 @@ library(plotly)
 
 TIMEZONE = "EST" #Used across all
 
-## EXO DATA ##
-
-#Read in current water quality sonde (EXO2) data from SARGE
-#Set exo column names
-exo_names <- read_delim("https://www.dropbox.com/scl/fi/0l884zjlaphi2nu9uupiw/WILSON_ExoTable.dat?rlkey=3ydvfbetag118ql5a03f3o9l8&st=80wnki57&dl=1", 
-                        delim = ",", skip = 1, show_col_types = F, n_max = 1)
-
-#Load data
-exo <- read_delim("https://www.dropbox.com/scl/fi/0l884zjlaphi2nu9uupiw/WILSON_ExoTable.dat?rlkey=3ydvfbetag118ql5a03f3o9l8&st=80wnki57&dl=1", 
-                        delim = ",", skip = 4, show_col_types = F,
-                  col_names = colnames(exo_names)) %>%
-  mutate(TIMESTAMP = paste(format(TIMESTAMP, "%Y-%m-%d %H:%M:%S")),
-         TIMESTAMP = ymd_hms(TIMESTAMP, tz = TIMEZONE)) %>%
-  select(-sn, -snn) %>%
-  rename(DO_mgL = ODO_MgL, 
-         DO_saturation = ODO_sat,
-         TDS_mgL = TDS_mg_L)
-
 exo_colors <- c("Depth_m" = "darkblue",
                 "DO_mgL" = "lightblue",
                 "pH" = "pink",
@@ -75,48 +57,10 @@ exo_colors <- c("Depth_m" = "darkblue",
                 "DO_saturation" = "lightblue",
                 "TDS_mgL" = "orange")
 
-## HYDROLOGY DATA ##
-
-#read in hydrologic data from hydrology IQ (Xylem Analytics)
-hydrology_names <- read_delim("https://www.dropbox.com/scl/fi/dqas4e92ngcsigqy7u107/WILSON_SontekTable.dat?rlkey=iw6azl1fqyyl521jpcgfjjcrk&st=d4xp83p3&dl=1", 
-                        delim = ",", skip = 1, show_col_types = F, n_max = 1)
-
-#Load data
-hydrology <- read_delim("https://www.dropbox.com/scl/fi/dqas4e92ngcsigqy7u107/WILSON_SontekTable.dat?rlkey=iw6azl1fqyyl521jpcgfjjcrk&st=d4xp83p3&dl=1", 
-                        delim = ",", skip = 4, show_col_types = F,
-                  col_names = colnames(hydrology_names)) %>%
-  mutate(TIMESTAMP = paste(format(TIMESTAMP, "%Y-%m-%d %H:%M:%S")),
-         TIMESTAMP = ymd_hms(TIMESTAMP, tz = TIMEZONE)) %>%
-  rename(Water_depth_m = Water_depth,
-         Index_velocity_ms = Index_velocity,
-         Mean_velocity_ms = Mean_velocity,
-         Flowrate_ms = Flowrate)
-
 hydrology_colors <- c("Water_depth_m" = "darkblue", 
                    "Flowrate_ms" = "lightblue1", 
                    "Index_velocity_ms" = "lightblue3", 
                    "Mean_velocity_ms" = "lightblue4")
-
-## GHG DATA ##
-
-#read in gas concentration data from the LI7810 (LI-COR)
-ghg_names <- read_delim("https://www.dropbox.com/scl/fi/gtmjx6216pfqnmb5cd1yc/WILSON_FLUX_7810.dat?rlkey=zfeh41fxjeyd3jn9sqf76zfza&st=6ljj68yu&dl=1", 
-                        delim = ",", skip = 1, show_col_types = F, n_max = 1)
-
-#Load data
-ghg <- read_delim("https://www.dropbox.com/scl/fi/gtmjx6216pfqnmb5cd1yc/WILSON_FLUX_7810.dat?rlkey=zfeh41fxjeyd3jn9sqf76zfza&st=6ljj68yu&dl=1", 
-                        delim = ",", skip = 4, show_col_types = F,
-                  col_names = colnames(ghg_names)) %>%
-  mutate(TIMESTAMP = paste(format(TIMESTAMP, "%Y-%m-%d %H:%M:%S")),
-         TIMESTAMP = ymd_hms(TIMESTAMP, tz = TIMEZONE)) %>%
-  rename(CH4d_ppb = CH4,
-         CO2d_ppm = CO2,
-         H2O_ppm = H2O,
-         Cavity_pressure = cavity_p,
-         Cavity_temperature = cavity_t) %>%
-  mutate(TIMESTAMP = round_date(TIMESTAMP, "minute")) %>%
-  group_by(TIMESTAMP) %>%
-  summarize(across(everything(), ~mean(.x, na.rm = T)))
 
 ghg_colors <- c("H2O_ppm" = "lightblue", 
                  "CO2d_ppm" = "goldenrod", 
@@ -124,38 +68,9 @@ ghg_colors <- c("H2O_ppm" = "lightblue",
                  "Cavity_pressure" = "purple4",
                  "Cavity_temperature" = "red")
 
-## RADON DATA ##
-
-#read in radon concentration data from the RAD7 (Durridge)
-radon_names <- read_delim("https://www.dropbox.com/scl/fi/ttjde8cpqf7xgn8dgcdv2/WILSON_Rad7Table.dat?rlkey=hcg2ycle3cmkerc6ic7pa13g1&st=vx91f41x&dl=1", 
-                        delim = ",", skip = 1, show_col_types = F, n_max = 1)
-
-#Load data
-radon <- read_delim("https://www.dropbox.com/scl/fi/ttjde8cpqf7xgn8dgcdv2/WILSON_Rad7Table.dat?rlkey=hcg2ycle3cmkerc6ic7pa13g1&st=vx91f41x&dl=1", 
-                        delim = ",", skip = 4, show_col_types = F,
-                  col_names = colnames(radon_names)) %>%
-  mutate(TIMESTAMP = paste(format(TIMESTAMP, "%Y-%m-%d %H:%M:%S")),
-         TIMESTAMP = ymd_hms(TIMESTAMP, tz = TIMEZONE)) %>%
-  rename(Relative_humidity_pct = RH_sample_Rad7,
-         Radon_Bqm3 = Radon_concentration_Rad7,
-         Radon_error_Bqm3 = Radon_concentration_uncertainty_Rad7)
-
 rad_colors <- c("Relative_humidity_pct" = "lightblue", 
                 "Radon_Bqm3" = "purple", 
                 "Radon_error_Bqm3" = "darkblue")
-
-#Set min and max for date input
-min_date <- min(c(exo$TIMESTAMP,
-                  hydrology$TIMESTAMP,
-                  ghg$TIMESTAMP,
-                  radon$TIMESTAMP), 
-                na.rm = T)
-
-max_date <- max(c(exo$TIMESTAMP,
-                  hydrology$TIMESTAMP,
-                  ghg$TIMESTAMP,
-                  radon$TIMESTAMP), 
-                na.rm = T)
 ```
 
 ```{r}
@@ -163,14 +78,14 @@ max_date <- max(c(exo$TIMESTAMP,
 #| layout-ncol: 2
 
 dateInput('start_date', 'Start date for plots', 
-          min = min_date, 
-          max = max_date,
-          value = Sys.Date())
+          min = "2026-01-13", 
+          max = "2026-01-13",
+          value = "2026-01-13")
 
 dateInput('end_date', 'End date for plots', 
-          min = min_date, 
-          max = max_date,
-          value = Sys.Date())
+          min = "2026-01-13", 
+          max = "2026-01-13",
+          value = "2026-01-13")
 ```
 
 ::: {.row}
@@ -333,11 +248,98 @@ div(DT::dataTableOutput("table_radon"), style = "font-size:80%")
 
 Sys.setenv(TZ = TIMEZONE)
 
+## EXO DATA ##
+
+#Read in current water quality sonde (EXO2) data from SARGE
+#Set exo column names
+exo_names <- read_delim("https://www.dropbox.com/scl/fi/0l884zjlaphi2nu9uupiw/WILSON_ExoTable.dat?rlkey=3ydvfbetag118ql5a03f3o9l8&st=80wnki57&dl=1", 
+                        delim = ",", skip = 1, show_col_types = F, n_max = 1)
+
+#Load data
+exo <- read_delim("https://www.dropbox.com/scl/fi/0l884zjlaphi2nu9uupiw/WILSON_ExoTable.dat?rlkey=3ydvfbetag118ql5a03f3o9l8&st=80wnki57&dl=1", 
+                        delim = ",", skip = 4, show_col_types = F,
+                  col_names = colnames(exo_names)) %>%
+  mutate(TIMESTAMP = paste(format(TIMESTAMP, "%Y-%m-%d %H:%M:%S")),
+         TIMESTAMP = ymd_hms(TIMESTAMP, tz = TIMEZONE)) %>%
+  select(-sn, -snn) %>%
+  rename(DO_mgL = ODO_MgL, 
+         DO_saturation = ODO_sat,
+         TDS_mgL = TDS_mg_L)
+
+## HYDROLOGY DATA ##
+
+#read in hydrologic data from hydrology IQ (Xylem Analytics)
+hydrology_names <- read_delim("https://www.dropbox.com/scl/fi/dqas4e92ngcsigqy7u107/WILSON_SontekTable.dat?rlkey=iw6azl1fqyyl521jpcgfjjcrk&st=d4xp83p3&dl=1", 
+                        delim = ",", skip = 1, show_col_types = F, n_max = 1)
+
+#Load data
+hydrology <- read_delim("https://www.dropbox.com/scl/fi/dqas4e92ngcsigqy7u107/WILSON_SontekTable.dat?rlkey=iw6azl1fqyyl521jpcgfjjcrk&st=d4xp83p3&dl=1", 
+                        delim = ",", skip = 4, show_col_types = F,
+                  col_names = colnames(hydrology_names)) %>%
+  mutate(TIMESTAMP = paste(format(TIMESTAMP, "%Y-%m-%d %H:%M:%S")),
+         TIMESTAMP = ymd_hms(TIMESTAMP, tz = TIMEZONE)) %>%
+  rename(Water_depth_m = Water_depth,
+         Index_velocity_ms = Index_velocity,
+         Mean_velocity_ms = Mean_velocity,
+         Flowrate_ms = Flowrate)
+
+## GHG DATA ##
+
+#read in gas concentration data from the LI7810 (LI-COR)
+ghg_names <- read_delim("https://www.dropbox.com/scl/fi/gtmjx6216pfqnmb5cd1yc/WILSON_FLUX_7810.dat?rlkey=zfeh41fxjeyd3jn9sqf76zfza&st=6ljj68yu&dl=1", 
+                        delim = ",", skip = 1, show_col_types = F, n_max = 1)
+
+#Load data
+ghg <- read_delim("https://www.dropbox.com/scl/fi/gtmjx6216pfqnmb5cd1yc/WILSON_FLUX_7810.dat?rlkey=zfeh41fxjeyd3jn9sqf76zfza&st=6ljj68yu&dl=1", 
+                        delim = ",", skip = 4, show_col_types = F,
+                  col_names = colnames(ghg_names)) %>%
+  mutate(TIMESTAMP = paste(format(TIMESTAMP, "%Y-%m-%d %H:%M:%S")),
+         TIMESTAMP = ymd_hms(TIMESTAMP, tz = TIMEZONE)) %>%
+  rename(CH4d_ppb = CH4,
+         CO2d_ppm = CO2,
+         H2O_ppm = H2O,
+         Cavity_pressure = cavity_p,
+         Cavity_temperature = cavity_t) %>%
+  mutate(TIMESTAMP = round_date(TIMESTAMP, "minute")) %>%
+  group_by(TIMESTAMP) %>%
+  summarize(across(everything(), ~mean(.x, na.rm = T)))
+
+## RADON DATA ##
+
+#read in radon concentration data from the RAD7 (Durridge)
+radon_names <- read_delim("https://www.dropbox.com/scl/fi/ttjde8cpqf7xgn8dgcdv2/WILSON_Rad7Table.dat?rlkey=hcg2ycle3cmkerc6ic7pa13g1&st=vx91f41x&dl=1", 
+                        delim = ",", skip = 1, show_col_types = F, n_max = 1)
+
+#Load data
+radon <- read_delim("https://www.dropbox.com/scl/fi/ttjde8cpqf7xgn8dgcdv2/WILSON_Rad7Table.dat?rlkey=hcg2ycle3cmkerc6ic7pa13g1&st=vx91f41x&dl=1", 
+                        delim = ",", skip = 4, show_col_types = F,
+                  col_names = colnames(radon_names)) %>%
+  mutate(TIMESTAMP = paste(format(TIMESTAMP, "%Y-%m-%d %H:%M:%S")),
+         TIMESTAMP = ymd_hms(TIMESTAMP, tz = TIMEZONE)) %>%
+  rename(Relative_humidity_pct = RH_sample_Rad7,
+         Radon_Bqm3 = Radon_concentration_Rad7,
+         Radon_error_Bqm3 = Radon_concentration_uncertainty_Rad7)
+
+#Set min and max for date input
+min_date <- min(c(exo$TIMESTAMP,
+                  hydrology$TIMESTAMP,
+                  ghg$TIMESTAMP,
+                  radon$TIMESTAMP), 
+                na.rm = T)
+
+max_date <- max(c(exo$TIMESTAMP,
+                  hydrology$TIMESTAMP,
+                  ghg$TIMESTAMP,
+                  radon$TIMESTAMP), 
+                na.rm = T)
+
 updateDateInput(inputId = "start_date", 
+                min = min_date,
                 max = Sys.Date(),
                 value = Sys.Date())
 
 updateDateInput(inputId = "end_date", 
+                min = min_date,
                 max = Sys.Date(),
                 value = Sys.Date())
 
