@@ -38,7 +38,6 @@ library(DT)
 library(ggpubr)
 library(cowplot)
 library(plotly)
-library(tidyverse)
 
 ## Load data ##
 #Note this code could be adapted for use with the RAD8 (Durridge) and LI7820 N2O Analyzer
@@ -76,7 +75,7 @@ exo_colors <- c("Depth_m" = "darkblue",
                 "DO_saturation" = "lightblue",
                 "TDS_mgL" = "orange")
 
-## hydrology DATA ##
+## HYDROLOGY DATA ##
 
 #read in hydrologic data from hydrology IQ (Xylem Analytics)
 hydrology_names <- read_delim("https://www.dropbox.com/scl/fi/dqas4e92ngcsigqy7u107/WILSON_SontekTable.dat?rlkey=iw6azl1fqyyl521jpcgfjjcrk&st=d4xp83p3&dl=1", 
@@ -101,11 +100,11 @@ hydrology_colors <- c("Water_depth_m" = "darkblue",
 ## GHG DATA ##
 
 #read in gas concentration data from the LI7810 (LI-COR)
-ghg_names <- read_delim("https://www.dropbox.com/scl/fi/5mbm233tpfzjzwuxwqqfq/WILSON_FLUX_7810.dat?rlkey=7283hbfameqbscbdvriyx8sml&st=4jl7y7z6&dl=1", 
+ghg_names <- read_delim("https://www.dropbox.com/scl/fi/gtmjx6216pfqnmb5cd1yc/WILSON_FLUX_7810.dat?rlkey=zfeh41fxjeyd3jn9sqf76zfza&st=6ljj68yu&dl=1", 
                         delim = ",", skip = 1, show_col_types = F, n_max = 1)
 
 #Load data
-ghg <- read_delim("https://www.dropbox.com/scl/fi/5mbm233tpfzjzwuxwqqfq/WILSON_FLUX_7810.dat?rlkey=7283hbfameqbscbdvriyx8sml&st=4jl7y7z6&dl=1", 
+ghg <- read_delim("https://www.dropbox.com/scl/fi/gtmjx6216pfqnmb5cd1yc/WILSON_FLUX_7810.dat?rlkey=zfeh41fxjeyd3jn9sqf76zfza&st=6ljj68yu&dl=1", 
                         delim = ",", skip = 4, show_col_types = F,
                   col_names = colnames(ghg_names)) %>%
   mutate(TIMESTAMP = paste(format(TIMESTAMP, "%Y-%m-%d %H:%M:%S")),
@@ -166,12 +165,12 @@ max_date <- max(c(exo$TIMESTAMP,
 dateInput('start_date', 'Start date for plots', 
           min = min_date, 
           max = max_date,
-          value = "2024-09-19")
+          value = Sys.Date())
 
 dateInput('end_date', 'End date for plots', 
           min = min_date, 
           max = max_date,
-          value = "2024-09-27")
+          value = Sys.Date())
 ```
 
 ::: {.row}
@@ -332,6 +331,14 @@ div(DT::dataTableOutput("table_radon"), style = "font-size:80%")
 ```{r}
 #| context: server
 
+updateDateInput(inputId = "start_date", 
+                max = Sys.Date(),
+                value = Sys.Date())
+
+updateDateInput(inputId = "end_date", 
+                max = Sys.Date(),
+                value = Sys.Date())
+
 #Code for plots
 output$plot_exo <- renderPlotly({
   exo_recent <- exo %>%
@@ -411,19 +418,23 @@ output$plot_radon <- renderPlotly({
 
 #Code for data tables
 output$table_exo <- DT::renderDataTable({exo %>%
-    arrange(rev(TIMESTAMP))},
+    arrange(rev(TIMESTAMP)) %>%
+    mutate(TIMESTAMP = format(TIMESTAMP, "%Y-%m-%d %H:%M"))}, 
     rownames = F,
     class = "display nowrap")
 output$table_hydrology <- DT::renderDataTable({hydrology %>%
-    arrange(rev(TIMESTAMP))},
+    arrange(rev(TIMESTAMP)) %>%
+    mutate(TIMESTAMP = format(TIMESTAMP, "%Y-%m-%d %H:%M"))},
     rownames = F,
     class = "display nowrap")
 output$table_radon <- DT::renderDataTable({radon %>%
-    arrange(rev(TIMESTAMP))},
+    arrange(rev(TIMESTAMP)) %>%
+    mutate(TIMESTAMP = format(TIMESTAMP, "%Y-%m-%d %H:%M"))},
     rownames = F,
     class = "display nowrap")
 output$table_ghg <- DT::renderDataTable({ghg %>%
-    arrange(rev(TIMESTAMP))},
+    arrange(rev(TIMESTAMP)) %>%
+    mutate(TIMESTAMP = format(TIMESTAMP, "%Y-%m-%d %H:%M"))},
     rownames = F,
     class = "display nowrap")
 
@@ -433,23 +444,23 @@ now <- reactiveTimer(1000) #Gets the current time every second
 #Max timesteps for overview page
 output$data_latest <- renderText({
   formatted_date_ghg <- paste(format(max(ghg$TIMESTAMP, na.rm = T), 
-                                 "%Y-%m-%d %H:%M:%S"), 
-                          TIMEZONE)
+                                     "%Y-%m-%d %H:%M:%S"), 
+                              TIMEZONE)
   ghg_color <- if(now() - max(ghg$TIMESTAMP, na.rm = T) > hours(1)){
     ' style="color: #990000;"'} else {""}
   formatted_date_exo <- paste(format(max(exo$TIMESTAMP, na.rm = T), 
-                                 "%Y-%m-%d %H:%M:%S"), 
-                          TIMEZONE)
+                                     "%Y-%m-%d %H:%M:%S"), 
+                              TIMEZONE)
   exo_color <- if(now() - max(exo$TIMESTAMP, na.rm = T) > hours(1)){
     ' style="color: #990000;"'} else {""}
   formatted_date_rad <- paste(format(max(radon$TIMESTAMP, na.rm = T), 
-                                 "%Y-%m-%d %H:%M:%S"), 
-                          TIMEZONE)
+                                     "%Y-%m-%d %H:%M:%S"), 
+                              TIMEZONE)
   radon_color <- if(now() - max(radon$TIMESTAMP, na.rm = T) > hours(1)){
     ' style="color: #990000;"'} else {""}
   formatted_date_hydrology <- paste(format(max(hydrology$TIMESTAMP, na.rm = T), 
-                                 "%Y-%m-%d %H:%M:%S"), 
-                          TIMEZONE)
+                                           "%Y-%m-%d %H:%M:%S"), 
+                                    TIMEZONE)
   hydro_color <- if(now() - max(hydrology$TIMESTAMP, na.rm = T) > hours(1)){
     ' style="color: #990000;"'} else {""}
   formatted_list <- paste(
@@ -459,8 +470,8 @@ output$data_latest <- renderText({
     <li",radon_color,"><b>Radon detector:</b> ", formatted_date_rad, "</li></ul>")
   
   return(formatted_list)
-  })
-  
+})
+
 # Render the current time as a text output
 output$today <- renderText({
   paste("Current time: ", format(now(), "%Y-%m-%d %H:%M:%S"), TIMEZONE)
