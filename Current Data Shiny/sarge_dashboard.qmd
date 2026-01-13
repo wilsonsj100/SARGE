@@ -331,6 +331,8 @@ div(DT::dataTableOutput("table_radon"), style = "font-size:80%")
 ```{r}
 #| context: server
 
+Sys.setenv(TZ = TIMEZONE)
+
 updateDateInput(inputId = "start_date", 
                 max = Sys.Date(),
                 value = Sys.Date())
@@ -439,7 +441,7 @@ output$table_ghg <- DT::renderDataTable({ghg %>%
     class = "display nowrap")
 
 #todays date for overview page
-now <- reactiveTimer(1000) #Gets the current time every second
+now_txt <- reactiveTimer(1000) #Gets the current time every second
 
 #Max timesteps for overview page
 output$data_latest <- renderText({
@@ -474,7 +476,7 @@ output$data_latest <- renderText({
 
 # Render the current time as a text output
 output$today <- renderText({
-  paste("Current time: ", format(now(tzone = TIMEZONE), "%Y-%m-%d %H:%M:%S"), TIMEZONE)
+  paste("Current time: ", format(now_txt(), "%Y-%m-%d %H:%M:%S"), TIMEZONE)
 })
 
 ```
