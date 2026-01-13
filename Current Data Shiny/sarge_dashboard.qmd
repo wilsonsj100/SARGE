@@ -474,7 +474,7 @@ output$data_latest <- renderText({
 
 # Render the current time as a text output
 output$today <- renderText({
-  paste("Current time: ", format(now(), "%Y-%m-%d %H:%M:%S"), TIMEZONE)
+  paste("Current time: ", format(now(tzone = TIMEZONE), "%Y-%m-%d %H:%M:%S"), TIMEZONE)
 })
 
 ```
