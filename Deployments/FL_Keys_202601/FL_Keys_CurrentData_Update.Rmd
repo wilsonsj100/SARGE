@@ -1,7 +1,7 @@
 ---
 title: "SARGE_Data_Updater: Current Data FL Keys Jan. 2026"
 author: "Stephanie J. Wilson"
-date: '2026-01-18'
+date: '2026-01-19'
 output: pdf_document
 ---
 
@@ -16,6 +16,13 @@ library(plotrix)
 
 ```
 
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+cat("FLORIDA KEYS SARGE DEPLOYMENT: January 17th to 20th, 2026")
+
+```
+![](SARGE_FL_Keys_SetUp.jpg)
+
 ## EXO Data 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
@@ -23,11 +30,9 @@ library(plotrix)
 julian.date='2026-01-01'
 
 #read in the waterlevel data 
-
 #set dropbox wd
 setwd("C:/Users/wilsonsj/Dropbox (Smithsonian)/GENX2_Mesocosm_Data/current_data")
-#setwd("C:/Users/wilsonsj/Dropbox (Smithsonian)/GCREW_LOGGERNET_DATA")
-#setwd("S:/Biogeochemistry/COMPASS Synoptics/2024 Lateral Transport Campaigns/GWI Survey/20240919")
+
 
 exo <- read.table("WILSON_ExoTable.dat", header=TRUE, skip=3, sep= ",")
 #exo1 <- read.table("GCREW_MARSH_OUTLET_ExoTable_20230419020031.dat", header=TRUE, skip=3, sep= ",")
@@ -60,14 +65,14 @@ exo$Conductivity <- as.numeric(exo$Conductivity)
 
 ## Plot 
 waterlev <- ggplot(exo, aes(x=TIMESTAMP, y=Depth_m)) + geom_point(color="blue") + ylim(-0.5,2.5) + xlim(c(as.POSIXct('2026-01-17 12:00:00', format = "%Y-%m-%d %H:%M:%S"),
-     as.POSIXct('2026-01-18 12:00:00', format = "%Y-%m-%d %H:%M:%S"))) + 
+     as.POSIXct('2026-01-19 12:00:00', format = "%Y-%m-%d %H:%M:%S"))) + 
    theme_classic() + labs(title="EXO Water Level")
 waterlev
 
 ## Plot conductivity 
 cond <- ggplot(exo, aes(x=TIMESTAMP, y=Salinity_PPT)) + geom_point(color="purple") + 
 xlim(c(as.POSIXct('2026-01-17 12:00:00', format = "%Y-%m-%d %H:%M:%S"),
-     as.POSIXct('2026-01-18 12:00:00', format = "%Y-%m-%d %H:%M:%S"))) + ylim(20,50) + 
+     as.POSIXct('2026-01-19 12:00:00', format = "%Y-%m-%d %H:%M:%S"))) + ylim(20,50) + 
   theme_classic() + labs(title="EXO Salinity")
 cond
 
@@ -116,19 +121,19 @@ sontek$Water_depth <- as.numeric(sontek$Water_depth)
 ## Plot LGR Data for quick look
 flow <- ggplot(sontek, aes(x=TIMESTAMP, y=Flowrate)) + geom_point(color="black") +       
 xlim(c(as.POSIXct('2026-01-17 12:00:00', format = "%Y-%m-%d %H:%M:%S"),
-     as.POSIXct('2026-01-18 12:00:00', format = "%Y-%m-%d %H:%M:%S"))) + theme_classic() + 
+     as.POSIXct('2026-01-19 12:00:00', format = "%Y-%m-%d %H:%M:%S"))) + theme_classic() + 
       labs(title="Sontek Flow Rate")
 #flow
 
 flow1 <- ggplot(sontek, aes(x=TIMESTAMP, y=as.numeric(Index_velocity))) + geom_point(color="black") +       
 xlim(c(as.POSIXct('2026-01-17 18:00:00', format = "%Y-%m-%d %H:%M:%S"),
-     as.POSIXct('2026-01-18 12:00:00', format = "%Y-%m-%d %H:%M:%S"))) +
+     as.POSIXct('2026-01-19 12:00:00', format = "%Y-%m-%d %H:%M:%S"))) + ylim(-0.4, 0.3) + 
     labs(y="Index Velocity (m/s)") + theme_classic() + labs(title="Sontek Index Velocity")
 flow1
 
 sdepth <- ggplot(sontek, aes(x=TIMESTAMP, y=Water_depth)) + geom_point(color="darkblue") +
 xlim(c(as.POSIXct('2026-01-17 18:00:00', format = "%Y-%m-%d %H:%M:%S"),
-     as.POSIXct('2026-01-18 12:00:00', format = "%Y-%m-%d %H:%M:%S"))) + theme_classic() + 
+     as.POSIXct('2026-01-19 12:00:00', format = "%Y-%m-%d %H:%M:%S"))) + theme_classic() + ylim(0.1,1.5) + 
       labs(title="Sontek Water Depth")
 sdepth
 ```
@@ -186,17 +191,17 @@ flux$CO2d_ppmA <- as.numeric(flux$CO2)
 
 ## Plot LGR Data for quick look
 #CH4 
-CH4_lgr <- ggplot(flux, aes(x=TIMESTAMP1, y=CH4d_ppmA)) + geom_point(color="red")+
+CH4_lgr <- ggplot(flux, aes(x=TIMESTAMP1, y=CH4d_ppmA)) + geom_point(color="magenta")+
   xlim(c(as.POSIXct('2026-01-17 16:00:00', format = "%Y-%m-%d %H:%M:%S"),
-     as.POSIXct('2026-01-18 12:00:00', format = "%Y-%m-%d %H:%M:%S"))) + ylim(0,20000)+
-  theme_classic() + labs(title="LI-7810 Equilibrator CO2")
+     as.POSIXct('2026-01-19 12:00:00', format = "%Y-%m-%d %H:%M:%S"))) + ylim(0,20000)+
+  theme_classic() + labs(title="LI-7810 Equilibrator CH4")
 CH4_lgr
 
 #CO2 
 CO2_lgr <- ggplot(flux, aes(x=TIMESTAMP1, y=CO2d_ppmA)) + geom_point(color="darkred")+
 xlim(c(as.POSIXct('2026-01-17 16:00:00', format = "%Y-%m-%d %H:%M:%S"),
-     as.POSIXct('2026-01-18 12:00:00', format = "%Y-%m-%d %H:%M:%S"))) +
-  ylim(0, 750) + theme_classic() + labs(title="LI-7810 Equilibrator CH4")
+     as.POSIXct('2026-01-19 12:00:00', format = "%Y-%m-%d %H:%M:%S"))) +
+  ylim(150, 750) + theme_classic() + labs(title="LI-7810 Equilibrator CO2")
 CO2_lgr
 
 
@@ -243,7 +248,7 @@ rad$RH_sample_Rad7 <- as.numeric(rad$RH_sample_Rad7)
 radon <- ggplot(rad, aes(x=TIMESTAMP, y=Radon_concentration_Rad7)) + 
   geom_point(color="darkgreen",size=3) +
     xlim(c(as.POSIXct('2026-01-17 16:00:00', format = "%Y-%m-%d %H:%M:%S"),
-     as.POSIXct('2026-01-18 12:00:00', format = "%Y-%m-%d %H:%M:%S"))) + theme_classic() +  
+     as.POSIXct('2026-01-19 12:00:00', format = "%Y-%m-%d %H:%M:%S"))) + theme_classic() +  
   ylim(0,400) + labs(title="RAD7 Equilibrator Radon")
 radon
 
@@ -255,24 +260,24 @@ RH  <- ggplot(rad, aes(x=fDOY, y=RH_sample_Rad7)) + geom_point(color="red") + th
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
 All_Data <- ggplot() + 
-    geom_line(data=flux, aes(x=TIMESTAMP1, y=CO2d_ppmA*1, color="CO2"), size=0.75) + 
-    geom_line(data=flux, aes(x=TIMESTAMP1, y=CH4d_ppmA/10, color="CH4"), size=0.75) + 
-    geom_line(data=rad, aes(x=TIMESTAMP, y=Radon_concentration_Rad7, color="Radon"), size=0.75) + 
+    geom_point(data=flux, aes(x=TIMESTAMP1, y=CO2d_ppmA*1, color="CO2"), size=0.75) + 
+    geom_point(data=flux, aes(x=TIMESTAMP1, y=CH4d_ppmA/10, color="CH4"), size=0.75) + 
+    geom_point(data=rad, aes(x=TIMESTAMP, y=Radon_concentration_Rad7, color="Radon"), size=0.75) + 
     #geom_line(data=exo, aes(x=fDOY, y=Depth_m*500), color="red") +
     scale_color_manual(values = c( "violet", "darkred", "darkgreen"))+
     scale_y_continuous(
     "Radon (Bq/m3) & CO2 (ppm)", limits = c(0,1500),
     sec.axis = sec_axis(~ . *10, name = "CH4 (ppb)")) + 
      xlim(c(as.POSIXct('2026-01-17 18:00:00', format = "%Y-%m-%d %H:%M:%S"),
-     as.POSIXct('2026-01-18 09:00:00', format = "%Y-%m-%d %H:%M:%S"))) +
+     as.POSIXct('2026-01-19 09:00:00', format = "%Y-%m-%d %H:%M:%S"))) +
     theme_classic() + 
     labs(color=NULL)
 All_Data
 
 All_Dat <- ggplot() + 
    # geom_line(data=flux, aes(x=fDOY, y=CO2d_ppm/10, color="CO2")) + 
-    geom_line(data=flux, aes(x=TIMESTAMP1, y=CH4d_ppmA/10, color="CH4"), size=0.75) + 
-    geom_line(data=rad, aes(x=TIMESTAMP, y=Radon_concentration_Rad7, color="Radon"), size=0.75) + 
+    geom_point(data=flux, aes(x=TIMESTAMP1, y=CH4d_ppmA/10, color="CH4"), size=0.75) + 
+    geom_point(data=rad, aes(x=TIMESTAMP, y=Radon_concentration_Rad7, color="Radon"), size=0.75) + 
     #geom_line(data=exo, aes(x=fDOY, y=Depth_m*500), color="red") +
     scale_color_manual(values = c("violet", "darkgreen"))+
     scale_y_continuous(
@@ -281,7 +286,7 @@ All_Dat <- ggplot() +
     #xlim(152, 163) + 
     theme_classic() + 
          xlim(c(as.POSIXct('2026-01-17 18:00:00', format = "%Y-%m-%d %H:%M:%S"),
-     as.POSIXct('2026-01-18 09:00:00', format = "%Y-%m-%d %H:%M:%S"))) +
+     as.POSIXct('2026-01-19 09:00:00', format = "%Y-%m-%d %H:%M:%S"))) +
     labs(color=NULL)
 All_Dat
 
@@ -299,7 +304,7 @@ All_Data1 <- ggplot() +
      #xlim(152, 163) + 
     theme_classic() + 
     xlim(c(as.POSIXct('2026-01-17 18:00:00', format = "%Y-%m-%d %H:%M:%S"),
-     as.POSIXct('2026-01-18 09:00:00', format = "%Y-%m-%d %H:%M:%S"))) +
+     as.POSIXct('2026-01-19 09:00:00', format = "%Y-%m-%d %H:%M:%S"))) +
     labs(color=NULL)
 
 All_Data1
