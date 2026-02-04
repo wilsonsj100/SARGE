@@ -46,6 +46,22 @@ library(plotly)
 
 TIMEZONE = "EST" #Used across all
 
+#Specify variable choices
+
+exo_choices <- c("DO_mgL", "FDOM_RFU", "Chlorophyll_ugL", "Conductivity", 
+         "DO_saturation", "Salinity_PPT", "TDS_mgL", "pH", "Temp_C",
+         "Depth_m")
+
+hydrology_choices <- c("Water_depth_m", "Flowrate_ms", "Index_velocity_ms", 
+                       "Mean_velocity_ms")
+
+ghg_choices <- c("H2O_ppm", "CO2d_ppm", "CH4d_ppb", "Cavity_pressure", 
+                  "Cavity_temperature")
+
+radon_choices <- c("Relative_humidity_pct", "Radon_Bqm3", "Radon_error_Bqm3")
+
+# Specify colors
+
 exo_colors <- c("Depth_m" = "darkblue",
                 "DO_mgL" = "lightblue",
                 "pH" = "pink",
@@ -138,18 +154,6 @@ plotlyOutput('plot_exo', height = "400px")
 
 #Sidebar for exo data
 
-#Specify variable choices
-exo_choices <- c("DO_mgL", 
-         "FDOM_RFU", 
-         "Chlorophyll_ugL", 
-         "Conductivity", 
-         "DO_saturation",
-         "Salinity_PPT",
-         "TDS_mgL",
-         "pH",
-         "Temp_C",
-         "Depth_m")
-
 #Create checkboxes
 checkboxGroupInput("exo_vars",h4("Variables to plot"),
                    choices = exo_choices,
@@ -175,7 +179,6 @@ plotlyOutput('plot_hydrology', height = "360px")
 ```{r}
 #| panel: sidebar
 
-hydrology_choices <- c("Water_depth_m", "Flowrate_ms", "Index_velocity_ms", "Mean_velocity_ms")
 checkboxGroupInput("hydrology_vars", h4("Variables to plot"),
                    choices = hydrology_choices,
                    selected = c("Water_depth_m", "Index_velocity_ms"))
@@ -200,8 +203,6 @@ plotlyOutput('plot_ghg', height = "360px")
 ```{r}
 #| panel: sidebar
 
-ghg_choices <- c("H2O_ppm", "CO2d_ppm", "CH4d_ppb", "Cavity_pressure", 
-                  "Cavity_temperature")
 checkboxGroupInput("ghg_vars",h4("Variables to plot"),
                    choices = ghg_choices,
                    selected = c("CH4d_ppb", "CO2d_ppm"))
@@ -225,7 +226,6 @@ plotlyOutput('plot_radon', height = "360px")
 ```{r}
 #| panel: sidebar
 
-radon_choices <- c("Relative_humidity_pct", "Radon_Bqm3", "Radon_error_Bqm3")
 checkboxGroupInput("rad_vars",h4("Variables to plot"),
                    choices = radon_choices,
                    selected = c("Radon_Bqm3", "Radon_error_Bqm3"))
@@ -252,47 +252,76 @@ Sys.setenv(TZ = TIMEZONE)
 
 #Read in current water quality sonde (EXO2) data from SARGE
 #Set exo column names
-exo_names <- read_delim("https://www.dropbox.com/scl/fi/0l884zjlaphi2nu9uupiw/WILSON_ExoTable.dat?rlkey=3ydvfbetag118ql5a03f3o9l8&st=80wnki57&dl=1", 
-                        delim = ",", skip = 1, show_col_types = F, n_max = 1)
+#exo_names <- colnames(read_delim("https://www.dropbox.com/scl/fi/0l884zjlaphi2nu9uupiw/WILSON_ExoTable.dat?rlkey=3ydvfbetag118ql5a03f3o9l8&st=80wnki57&dl=1", 
+#                        delim = ",", skip = 1, show_col_types = F, n_max = 1))
+#dput(exo_names)
+exo_names <- c("TIMESTAMP", "RECORD", "Date", "Time", "Chlorophyll_RFU", "Chlorophyll_ugL", 
+               "Conductivity", "FDOM_QSU", "FDOM_RFU", "NLF_conductivity", "ODO_sat", 
+               "ODO_local", "ODO_MgL", "Pressure_psia", "Salinity_PPT", "Specific_Conductivity_uScm", 
+               "BGA_PE_RFU", "BGA_PE_ugL", "TDS_mg_L", "Turbidity_FNU", "Wiper_Position_mv", 
+               "pH", "pH_mv", "Temp_C", "Depth_m", "Battery_v", "Cable_v", "Wiper_Current_ma", 
+               "sn", "snn")
 
 #Load data
 exo <- read_delim("https://www.dropbox.com/scl/fi/0l884zjlaphi2nu9uupiw/WILSON_ExoTable.dat?rlkey=3ydvfbetag118ql5a03f3o9l8&st=80wnki57&dl=1", 
                         delim = ",", skip = 4, show_col_types = F,
-                  col_names = colnames(exo_names)) %>%
+                  col_names = exo_names) %>%
   mutate(TIMESTAMP = paste(format(TIMESTAMP, "%Y-%m-%d %H:%M:%S")),
          TIMESTAMP = ymd_hms(TIMESTAMP, tz = TIMEZONE)) %>%
   select(-sn, -snn) %>%
   rename(DO_mgL = ODO_MgL, 
          DO_saturation = ODO_sat,
-         TDS_mgL = TDS_mg_L)
+         TDS_mgL = TDS_mg_L) %>%
+  select(all_of(c(exo_choices, "TIMESTAMP")))
 
 ## HYDROLOGY DATA ##
 
 #read in hydrologic data from hydrology IQ (Xylem Analytics)
-hydrology_names <- read_delim("https://www.dropbox.com/scl/fi/dqas4e92ngcsigqy7u107/WILSON_SontekTable.dat?rlkey=iw6azl1fqyyl521jpcgfjjcrk&st=d4xp83p3&dl=1", 
-                        delim = ",", skip = 1, show_col_types = F, n_max = 1)
+#hydrology_names <- colnames(read_delim("https://www.dropbox.com/scl/fi/dqas4e92ngcsigqy7u107/WILSON_SontekTable.dat?rlkey=iw6azl1fqyyl521jpcgfjjcrk&st=d4xp83p3&dl=1", 
+#                        delim = ",", skip = 1, show_col_types = F, n_max = 1))
+#dput(hydrology_names)
+hydrology_names <- c('TIMESTAMP', 'RECORD', 'SONTEK_ID', 'Sample_number', 'yyyy', 
+                     'MM', 'dd', 'hh', 'Minute', 'ss', 'Flowrate', 'Stage', 
+                     'Mean_velocity', 'Total_volume', 'Water_depth', 
+                     'Index_velocity', 'Cross_area', 'Water_temperature', 
+                     'System_status', 'Velocity_XZxc', 'Velocity_XZzc', 
+                     'Velocity_XZxL', 'Velocity_XZxR', 'Batt_Vol_Sontek', 
+                     'Pitch_angle', 'Roll_angle', 'Perc_submergance', 'IceScore')
 
 #Load data
 hydrology <- read_delim("https://www.dropbox.com/scl/fi/dqas4e92ngcsigqy7u107/WILSON_SontekTable.dat?rlkey=iw6azl1fqyyl521jpcgfjjcrk&st=d4xp83p3&dl=1", 
                         delim = ",", skip = 4, show_col_types = F,
-                  col_names = colnames(hydrology_names)) %>%
+                  col_names = hydrology_names) %>%
   mutate(TIMESTAMP = paste(format(TIMESTAMP, "%Y-%m-%d %H:%M:%S")),
          TIMESTAMP = ymd_hms(TIMESTAMP, tz = TIMEZONE)) %>%
   rename(Water_depth_m = Water_depth,
          Index_velocity_ms = Index_velocity,
          Mean_velocity_ms = Mean_velocity,
-         Flowrate_ms = Flowrate)
+         Flowrate_ms = Flowrate) %>%
+  select(all_of(c(hydrology_choices, "TIMESTAMP")))
 
 ## GHG DATA ##
 
 #read in gas concentration data from the LI7810 (LI-COR)
-ghg_names <- read_delim("https://www.dropbox.com/scl/fi/gtmjx6216pfqnmb5cd1yc/WILSON_FLUX_7810.dat?rlkey=zfeh41fxjeyd3jn9sqf76zfza&st=6ljj68yu&dl=1", 
-                        delim = ",", skip = 1, show_col_types = F, n_max = 1)
+#ghg_names <- colnames(read_delim("https://www.dropbox.com/scl/fi/gtmjx6216pfqnmb5cd1yc/WILSON_FLUX_7810.dat?rlkey=zfeh41fxjeyd3jn9sqf76zfza&st=6ljj68yu&dl=1", 
+#                        delim = ",", skip = 1, show_col_types = F, n_max = 1))
+#dput(ghg_names)
+ghg_names <- c("TIMESTAMP", "RECORD", "TimeLong7810", "LI7810_time", "Seconds", 
+               "Nanoseconds", "NDX", "Diag", "H2O", "CO2", "CH4", "cavity_p", 
+               "cavity_t", "laser_phase_p", "laser_t", "residual", "ringdown", 
+               "thermal_enc_t", "phase_err", "laser_t_shift", "vin", "cavity_p_sp", 
+               "board_t", "case_t", "exfit_tau_rd1", "peak_ht_1", "exfit_tau_rd2", 
+               "peak_ht_2", "tec_sp", "phase_ctrl_out", "meas_phase", "laser_phase_sp", 
+               "num_peaks_win", "post_ringdwn_1_ign_len", "ringdwn_1_loc", "peak_x0", 
+               "xderiv_weight", "xderiv2_weight", "ch4_spec_weight", "co2_spec_weight", 
+               "h2o_spec_weight", "start_freq", "cavity_htr_w", "laser_ref_pwr", 
+               "offset_weight", "slope_weight", "evenodd_weight", "evenodd_lin_weight", 
+               "num_skipped_modes", "pump_sp", "pump_tach_ph")
 
 #Load data
 ghg <- read_delim("https://www.dropbox.com/scl/fi/gtmjx6216pfqnmb5cd1yc/WILSON_FLUX_7810.dat?rlkey=zfeh41fxjeyd3jn9sqf76zfza&st=6ljj68yu&dl=1", 
                         delim = ",", skip = 4, show_col_types = F,
-                  col_names = colnames(ghg_names)) %>%
+                  col_names = ghg_names) %>%
   mutate(TIMESTAMP = paste(format(TIMESTAMP, "%Y-%m-%d %H:%M:%S")),
          TIMESTAMP = ymd_hms(TIMESTAMP, tz = TIMEZONE)) %>%
   rename(CH4d_ppb = CH4,
@@ -300,6 +329,7 @@ ghg <- read_delim("https://www.dropbox.com/scl/fi/gtmjx6216pfqnmb5cd1yc/WILSON_F
          H2O_ppm = H2O,
          Cavity_pressure = cavity_p,
          Cavity_temperature = cavity_t) %>%
+  select(all_of(c(ghg_choices, "TIMESTAMP"))) %>%
   mutate(TIMESTAMP = round_date(TIMESTAMP, "minute")) %>%
   group_by(TIMESTAMP) %>%
   summarize(across(everything(), ~mean(.x, na.rm = T)))
@@ -307,18 +337,28 @@ ghg <- read_delim("https://www.dropbox.com/scl/fi/gtmjx6216pfqnmb5cd1yc/WILSON_F
 ## RADON DATA ##
 
 #read in radon concentration data from the RAD7 (Durridge)
-radon_names <- read_delim("https://www.dropbox.com/scl/fi/ttjde8cpqf7xgn8dgcdv2/WILSON_Rad7Table.dat?rlkey=hcg2ycle3cmkerc6ic7pa13g1&st=vx91f41x&dl=1", 
-                        delim = ",", skip = 1, show_col_types = F, n_max = 1)
+#radon_names <- colnames(read_delim("https://www.dropbox.com/scl/fi/ttjde8cpqf7xgn8dgcdv2/WILSON_Rad7Table.dat?rlkey=hcg2ycle3cmkerc6ic7pa13g1&st=vx91f41x&dl=1", 
+#                        delim = ",", skip = 1, show_col_types = F, n_max = 1))
+#dput(radon_names)
+radon_names <- c("TIMESTAMP", "RECORD", "Record_RAD7", "Year_RAD7", "Month_RAD7", 
+                 "Day_Rad7", "Hour_Rad7", "Minute_Rad7", "Total_Counts_Rad7", 
+                 "Live_Time_Rad7", "PER_TOT_A_Rad7", "PER_TOT_B_Rad7", "PER_TOT_C_Rad7", 
+                 "PER_TOT_D_Rad7", "High_Voltage_Level_Rad7", "High_Voltage_Duty_Rad7", 
+                 "Temp_sample_Rad7", "RH_sample_Rad7", "Leakage_Current_Rad7", 
+                 "Battery_Volt_Rad7", "Pump_current_Rad7", "Flags_Byte_Rad7", 
+                 "Radon_concentration_Rad7", "Radon_concentration_uncertainty_Rad7", 
+                 "Units_Byt_Rad7")
 
 #Load data
 radon <- read_delim("https://www.dropbox.com/scl/fi/ttjde8cpqf7xgn8dgcdv2/WILSON_Rad7Table.dat?rlkey=hcg2ycle3cmkerc6ic7pa13g1&st=vx91f41x&dl=1", 
                         delim = ",", skip = 4, show_col_types = F,
-                  col_names = colnames(radon_names)) %>%
+                  col_names = radon_names) %>%
   mutate(TIMESTAMP = paste(format(TIMESTAMP, "%Y-%m-%d %H:%M:%S")),
          TIMESTAMP = ymd_hms(TIMESTAMP, tz = TIMEZONE)) %>%
   rename(Relative_humidity_pct = RH_sample_Rad7,
          Radon_Bqm3 = Radon_concentration_Rad7,
-         Radon_error_Bqm3 = Radon_concentration_uncertainty_Rad7)
+         Radon_error_Bqm3 = Radon_concentration_uncertainty_Rad7) %>%
+  select(all_of(c(radon_choices, "TIMESTAMP")))
 
 #Set min and max for date input
 min_date <- min(c(exo$TIMESTAMP,
@@ -336,12 +376,12 @@ max_date <- max(c(exo$TIMESTAMP,
 updateDateInput(inputId = "start_date", 
                 min = min_date,
                 max = Sys.Date(),
-                value = Sys.Date())
+                value = max_date - days(7))
 
 updateDateInput(inputId = "end_date", 
                 min = min_date,
                 max = Sys.Date(),
-                value = Sys.Date())
+                value = max_date)
 
 #Code for plots
 output$plot_exo <- renderPlotly({
