@@ -18,10 +18,10 @@ library(plotrix)
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
-cat("FLORIDA TAMPA SARGE DEPLOYMENT: January 19th to 20th, 2026")
+cat("FLORIDA TAMPA SARGE DEPLOYMENT: January 24th to 25th, 2026")
 
 ```
-#![](SARGE_FL_Keys_SetUp.jpg)
+![](SARGE_FL_Tampa_Creek.jpg)
 
 ## EXO Data 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
