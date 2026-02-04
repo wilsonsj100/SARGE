@@ -84,18 +84,76 @@ ul.task-list li input[type="checkbox"] {
 }
 
 </style>
+<style>
+#loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #ffffffcc;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.5s ease;
+}
+
+#loading-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Spinner */
+.spinner {
+  border: 8px solid #c3c3c3; 
+  border-top: 8px solid #054163; 
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+#loading-overlay p {
+  font-size: 24px;
+  font-weight: bold;
+  color: #054163;
+}
+</style>
+<div id="loading-overlay">
+<div class="spinner">
+
+</div>
+<p>
+Loading the latest SARGE data…
+</p>
+</div>
+<script>
+Shiny.addCustomMessageHandler("hideLoadingOverlay", function(message) {
+  const overlay = document.getElementById("loading-overlay");
+  overlay.classList.add("hidden");       // triggers fade-out
+  setTimeout(() => overlay.remove(), 600); // remove from DOM after fade
+});
+</script>
 <div class="cell panel-input card bg-light p-2 quarto-layout-panel" data-layout-ncol="2">
 <div class="quarto-layout-row">
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div id="start_date" class="shiny-date-input form-group shiny-input-container">
 <label class="control-label" id="start_date-label" for="start_date">Start date for plots</label>
-<input type="text" class="form-control" aria-labelledby="start_date-label" title="Date format: yyyy-mm-dd" data-date-language="en" data-date-week-start="0" data-date-format="yyyy-mm-dd" data-date-start-view="month" data-min-date="2026-01-13" data-max-date="2026-01-13" data-initial-date="2026-01-13" data-date-autoclose="true" data-date-dates-disabled="null" data-date-days-of-week-disabled="null">
+<input type="text" class="form-control" aria-labelledby="start_date-label" title="Date format: yyyy-mm-dd" data-date-language="en" data-date-week-start="0" data-date-format="yyyy-mm-dd" data-date-start-view="month" data-initial-date="2026-02-04" data-date-autoclose="true" data-date-dates-disabled="null" data-date-days-of-week-disabled="null">
 </div>
 </div>
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div id="end_date" class="shiny-date-input form-group shiny-input-container">
 <label class="control-label" id="end_date-label" for="end_date">End date for plots</label>
-<input type="text" class="form-control" aria-labelledby="end_date-label" title="Date format: yyyy-mm-dd" data-date-language="en" data-date-week-start="0" data-date-format="yyyy-mm-dd" data-date-start-view="month" data-min-date="2026-01-13" data-max-date="2026-01-13" data-initial-date="2026-01-13" data-date-autoclose="true" data-date-dates-disabled="null" data-date-days-of-week-disabled="null">
+<input type="text" class="form-control" aria-labelledby="end_date-label" title="Date format: yyyy-mm-dd" data-date-language="en" data-date-week-start="0" data-date-format="yyyy-mm-dd" data-date-start-view="month" data-initial-date="2026-02-04" data-date-autoclose="true" data-date-dates-disabled="null" data-date-days-of-week-disabled="null">
 </div>
 </div>
 </div>
@@ -478,6 +536,17 @@ rad_colors <- c("Relative_humidity_pct" = "lightblue",
 <script type="application/shiny-prerendered" data-context="server">
 Sys.setenv(TZ = TIMEZONE)
 
+output$data_ready <- renderText({
+  ready <- nrow(exo) > 0 &&
+           nrow(hydrology) > 0 &&
+           nrow(ghg) > 0 &&
+           nrow(radon) > 0
+  
+  if (ready) "true" else "false"
+})
+
+outputOptions(output, "data_ready", suspendWhenHidden = FALSE)
+
 ## EXO DATA ##
 
 #Read in current water quality sonde (EXO2) data from SARGE
@@ -751,6 +820,14 @@ output$today <- renderText({
   paste("Current time: ", format(now_txt(), "%Y-%m-%d %H:%M:%S"), TIMEZONE)
 })
 
+# Add an observer at the end of your server setup
+observe({
+  # Wait until all data is loaded
+  req(nrow(exo) > 0, nrow(hydrology) > 0, nrow(ghg) > 0, nrow(radon) > 0)
+  
+  # Hide the overlay using JavaScript
+  session$sendCustomMessage("hideLoadingOverlay", TRUE)
+})
 </script>
  
 <script type="application/shiny-prerendered" data-context="server-extras">
