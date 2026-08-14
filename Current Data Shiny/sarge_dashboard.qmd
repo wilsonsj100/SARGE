@@ -478,7 +478,7 @@ updateDateInput(
   inputId = "start_date",
   min = min_date,
   max = Sys.Date(),
-  value = max_date - days(7)
+  value = max_date - days(3)
 )
 
 updateDateInput(

@@ -152,7 +152,7 @@ ui <- fixedPage(
         dateInput(
           "start_date",
           "Start date for plots",
-          value = as.Date(max_date) - days(7),
+          value = as.Date(max_date) - days(3),
           min = as.Date(min_date),
           max = Sys.Date()
         )
@@ -235,7 +235,7 @@ server <- function(input, output, session) {
     "start_date",
     min = as.Date(min_date),
     max = Sys.Date(),
-    value = as.Date(max_date) - days(7)
+    value = as.Date(max_date) - days(3)
   )
   
   updateDateInput(
