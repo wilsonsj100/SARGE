@@ -87,6 +87,7 @@ library(shiny)
 library(tidyverse)
 library(lubridate)
 library(plotly)
+source("../R/plot_sarge.R")
 
 ## Load data ##
 # Note this code could be adapted for use with the RAD8 (Durridge) and LI7820 N2O Analyzer
@@ -489,93 +490,41 @@ updateDateInput(
 
 # Code for plots
 output$plot_exo <- renderPlotly({
-  exo_recent <- exo %>%
-    filter(
-      as.Date(TIMESTAMP) >= input$start_date,
-      as.Date(TIMESTAMP) <= input$end_date
-    ) %>%
-    select(TIMESTAMP, all_of(input$exo_vars)) %>%
-    pivot_longer(input$exo_vars)
-
-  p1 <- exo_recent %>%
-    ggplot(aes(x = TIMESTAMP, y = value, color = name)) +
-    geom_point(size = 0.3) +
-    theme_classic() +
-    facet_wrap(~name, scales = "free_y") +
-    scale_color_manual(values = exo_colors) +
-    theme(
-      axis.title.x = element_blank(),
-      legend.position = "none"
-    )
+  p1 <- plot_sarge(exo, 
+                   input$start_date, 
+                   input$end_date, 
+                   input$exo_vars,
+                   input$exo_colors)
 
   plotly::ggplotly(p1, tooltip = c("TIMESTAMP", "value"))
 })
 
 output$plot_hydrology <- renderPlotly({
-  hydrology_recent <- hydrology %>%
-    filter(
-      as.Date(TIMESTAMP) >= input$start_date,
-      as.Date(TIMESTAMP) <= input$end_date
-    ) %>%
-    select(TIMESTAMP, all_of(input$hydrology_vars)) %>%
-    pivot_longer(input$hydrology_vars)
-
-  p1 <- hydrology_recent %>%
-    ggplot(aes(x = TIMESTAMP, y = value, color = name)) +
-    geom_point(size = 0.3) +
-    theme_classic() +
-    scale_color_manual(values = hydrology_colors) +
-    facet_wrap(~name, scales = "free_y") +
-    theme(
-      axis.title.x = element_blank(),
-      legend.position = "none"
-    )
+  p1 <- plot_sarge(hydrology, 
+                   input$start_date, 
+                   input$end_date, 
+                   input$hydrology_vars,
+                   input$hydrology_colors)
 
   plotly::ggplotly(p1, tooltip = c("TIMESTAMP", "value"))
 })
 
 output$plot_ghg <- renderPlotly({
-  ghg_recent <- ghg %>%
-    filter(
-      as.Date(TIMESTAMP) >= input$start_date,
-      as.Date(TIMESTAMP) <= input$end_date
-    ) %>%
-    select(TIMESTAMP, all_of(input$ghg_vars)) %>%
-    pivot_longer(input$ghg_vars)
-
-  p1 <- ghg_recent %>%
-    ggplot(aes(x = TIMESTAMP, y = value, color = name)) +
-    geom_point(size = 0.3) +
-    theme_classic() +
-    scale_color_manual(values = ghg_colors) +
-    facet_wrap(~name, scales = "free_y") +
-    theme(
-      axis.title.x = element_blank(),
-      legend.position = "none"
-    )
+  p1 <- plot_sarge(ghg, 
+                   input$start_date, 
+                   input$end_date, 
+                   input$ghg_vars,
+                   input$ghg_colors)
 
   plotly::ggplotly(p1, tooltip = c("TIMESTAMP", "value"))
 })
 
 output$plot_radon <- renderPlotly({
-  rad_recent <- radon %>%
-    filter(
-      as.Date(TIMESTAMP) >= input$start_date,
-      as.Date(TIMESTAMP) <= input$end_date
-    ) %>%
-    select(TIMESTAMP, all_of(input$rad_vars)) %>%
-    pivot_longer(input$rad_vars)
-
-  p1 <- rad_recent %>%
-    ggplot(aes(x = TIMESTAMP, y = value, color = name)) +
-    geom_point(size = 0.3) +
-    theme_classic() +
-    scale_color_manual(values = rad_colors) +
-    facet_wrap(~name, scales = "free_y") +
-    theme(
-      axis.title.x = element_blank(),
-      legend.position = "none"
-    )
+  p1 <- plot_sarge(radon, 
+                   input$start_date, 
+                   input$end_date, 
+                   input$rad_vars,
+                   input$rad_colors)
 
   plotly::ggplotly(p1, tooltip = c("TIMESTAMP", "value"))
 })
