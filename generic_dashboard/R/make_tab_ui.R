@@ -2,7 +2,7 @@
 # UI HELPERS
 # ============================================================
 
-make_tab_ui <- function(tab_name) {
+make_tab_ui <- function(tab_name, variables) {
   
   tab_vars <- variables %>%
     filter(tab_name == !!tab_name)

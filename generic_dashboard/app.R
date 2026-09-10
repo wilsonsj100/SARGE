@@ -6,7 +6,7 @@ library(DT)
 
 source("../generic_dashboard/R/plot_sarge.R")
 source("../generic_dashboard/R/check_timestamps.R")
-source("../R/make_tab_ui.R")
+source("../generic_dashboard/R/make_tab_ui.R")
 
 
 # ============================================================
@@ -74,7 +74,7 @@ for (i in seq_len(nrow(tabs))) {
 
 data_tabs <- lapply(
   tabs$tab_name,
-  make_tab_ui
+  function(x) make_tab_ui(x, variables = variables)
 )
 
 
